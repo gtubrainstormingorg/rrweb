@@ -1,9 +1,9 @@
-import type { Mirror, serializedNodeWithId } from 'rrweb-snapshot';
-import { genId, NodeType } from 'rrweb-snapshot';
+import type { Mirror, serializedNodeWithId } from '@howdygo/rrweb-snapshot';
+import { genId, NodeType } from '@howdygo/rrweb-snapshot';
 import type { CrossOriginIframeMessageEvent } from '../types';
 import CrossOriginIframeMirror from './cross-origin-iframe-mirror';
-import { EventType, IncrementalSource } from '@rrweb/types';
-import type { eventWithTime, mutationCallBack } from '@rrweb/types';
+import { EventType, IncrementalSource } from '@howdygo/rrweb-types';
+import type { eventWithTime, mutationCallBack } from '@howdygo/rrweb-types';
 import type { StylesheetManager } from './stylesheet-manager';
 
 export class IframeManager {
