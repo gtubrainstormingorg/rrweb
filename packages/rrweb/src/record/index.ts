@@ -3,7 +3,7 @@ import {
   MaskInputOptions,
   SlimDOMOptions,
   createMirror,
-} from '@howdygo/rrweb-snapshot';
+} from 'howdygo-rrweb-snapshot';
 import { initObservers, mutationBuffers } from './observer';
 import {
   on,
@@ -27,7 +27,7 @@ import {
   scrollCallback,
   canvasMutationParam,
   adoptedStyleSheetParam,
-} from '@howdygo/rrweb-types';
+} from 'howdygo-rrweb-types';
 import type { CrossOriginIframeMessageEventContent } from '../types';
 import { IframeManager } from './iframe-manager';
 import { ShadowDomManager } from './shadow-dom-manager';

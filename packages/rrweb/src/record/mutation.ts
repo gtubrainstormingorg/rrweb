@@ -10,7 +10,7 @@ import {
   isNativeShadowDom,
   getInputType,
   toLowerCase,
-} from '@howdygo/rrweb-snapshot';
+} from 'howdygo-rrweb-snapshot';
 import type { observerParam, MutationBufferParam } from '../types';
 import type {
   mutationRecord,
@@ -19,7 +19,7 @@ import type {
   removedNodeMutation,
   addedNodeMutation,
   Optional,
-} from '@howdygo/rrweb-types';
+} from 'howdygo-rrweb-types';
 import {
   isBlocked,
   isAncestorRemoved,

@@ -1,9 +1,9 @@
 import { encode } from 'base64-arraybuffer';
-import type { DataURLOptions } from '@howdygo/rrweb-snapshot';
+import type { DataURLOptions } from 'howdygo-rrweb-snapshot';
 import type {
   ImageBitmapDataURLWorkerParams,
   ImageBitmapDataURLWorkerResponse,
-} from '@howdygo/rrweb-types';
+} from 'howdygo-rrweb-types';
 
 const lastBlobMap: Map<number, string> = new Map();
 const transparentBlobMap: Map<string, string> = new Map();

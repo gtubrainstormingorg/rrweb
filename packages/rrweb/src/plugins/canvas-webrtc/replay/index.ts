@@ -1,5 +1,5 @@
-import type { RRNode } from '@howdygo/rrdom';
-import type { Mirror } from '@howdygo/rrweb-snapshot';
+import type { RRNode } from 'howdygo-rrdom';
+import type { Mirror } from 'howdygo-rrweb-snapshot';
 import SimplePeer from 'simple-peer-light';
 import type { Replayer } from '../../../replay';
 import type { ReplayPlugin } from '../../../types';

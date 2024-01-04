@@ -1,11 +1,11 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { chromium } from 'playwright';
-import { EventType, eventWithTime } from '@howdygo/rrweb-types';
-import type { RRwebPlayerOptions } from '@howdygo/rrweb-player';
+import { EventType, eventWithTime } from 'howdygo-rrweb-types';
+import type { RRwebPlayerOptions } from 'howdygo-rrweb-player';
 
 const rrwebScriptPath = path.resolve(
-  require.resolve('@howdygo/rrweb-player'),
+  require.resolve('howdygo-rrweb-player'),
   '../../dist/index.js',
 );
 const rrwebStylePath = path.resolve(rrwebScriptPath, '../style.css');

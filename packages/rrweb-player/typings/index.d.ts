@@ -1,7 +1,7 @@
-import { playerConfig } from '@howdygo/rrweb/typings/types';
-import { eventWithTime } from '@howdygo/rrweb-types';
-import { Replayer } from '@howdygo/rrweb';
-import { Mirror } from '@howdygo/rrweb-snapshot';
+import { playerConfig } from 'howdygo-rrweb/typings/types';
+import { eventWithTime } from 'howdygo-rrweb-types';
+import { Replayer } from 'howdygo-rrweb';
+import { Mirror } from 'howdygo-rrweb-snapshot';
 import { SvelteComponent } from 'svelte';
 
 export type RRwebPlayerOptions = {

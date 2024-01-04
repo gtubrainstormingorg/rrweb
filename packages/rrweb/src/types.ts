@@ -5,12 +5,12 @@ import type {
   MaskInputFn,
   MaskTextFn,
   DataURLOptions,
-} from '@howdygo/rrweb-snapshot';
+} from 'howdygo-rrweb-snapshot';
 import type { PackFn, UnpackFn } from './packer/base';
 import type { IframeManager } from './record/iframe-manager';
 import type { ShadowDomManager } from './record/shadow-dom-manager';
 import type { Replayer } from './replay';
-import type { RRNode } from '@howdygo/rrdom';
+import type { RRNode } from 'howdygo-rrdom';
 import type { CanvasManager } from './record/observers/canvas/canvas-manager';
 import type { StylesheetManager } from './record/stylesheet-manager';
 import type {
@@ -37,7 +37,7 @@ import type {
   styleDeclarationCallback,
   styleSheetRuleCallback,
   viewportResizeCallback,
-} from '@howdygo/rrweb-types';
+} from 'howdygo-rrweb-types';
 import type ProcessedNodeManager from './record/processed-node-manager';
 
 export type recordOptions<T> = {

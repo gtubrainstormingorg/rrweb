@@ -8,10 +8,10 @@ import type {
   IWindow,
   DeprecatedMirror,
   textMutation,
-} from '@howdygo/rrweb-types';
-import type { IMirror, Mirror } from '@howdygo/rrweb-snapshot';
-import { isShadowRoot, IGNORED_NODE, classMatchesRegex } from '@howdygo/rrweb-snapshot';
-import type { RRNode, RRIFrameElement } from '@howdygo/rrdom';
+} from 'howdygo-rrweb-types';
+import type { IMirror, Mirror } from 'howdygo-rrweb-snapshot';
+import { isShadowRoot, IGNORED_NODE, classMatchesRegex } from 'howdygo-rrweb-snapshot';
+import type { RRNode, RRIFrameElement } from 'howdygo-rrdom';
 
 export function on(
   type: string,

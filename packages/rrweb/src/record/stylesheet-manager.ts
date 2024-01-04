@@ -1,11 +1,11 @@
-import type { elementNode, serializedNodeWithId } from '@howdygo/rrweb-snapshot';
-import { stringifyRule } from '@howdygo/rrweb-snapshot';
+import type { elementNode, serializedNodeWithId } from 'howdygo-rrweb-snapshot';
+import { stringifyRule } from 'howdygo-rrweb-snapshot';
 import type {
   adoptedStyleSheetCallback,
   adoptedStyleSheetParam,
   attributeMutation,
   mutationCallBack,
-} from '@howdygo/rrweb-types';
+} from 'howdygo-rrweb-types';
 import { StyleSheetMirror } from '../utils';
 
 export class StylesheetManager {

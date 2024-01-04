@@ -10,7 +10,7 @@ import {
   IncrementalSource,
   styleSheetRuleData,
   selectionData,
-} from '@howdygo/rrweb-types';
+} from 'howdygo-rrweb-types';
 import {
   assertSnapshot,
   getServerURL,

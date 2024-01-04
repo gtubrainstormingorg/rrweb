@@ -1,4 +1,4 @@
-import type { Mirror } from '@howdygo/rrweb-snapshot';
+import type { Mirror } from 'howdygo-rrweb-snapshot';
 import {
   blockClass,
   CanvasContext,
@@ -6,7 +6,7 @@ import {
   canvasMutationWithType,
   IWindow,
   listenerHandler,
-} from '@howdygo/rrweb-types';
+} from 'howdygo-rrweb-types';
 import { hookSetter, isBlocked, patch } from '../../../utils';
 import { saveWebGLVar, serializeArgs } from './serialize-args';
 

@@ -1,4 +1,4 @@
-import type { ICrossOriginIframeMirror } from '@howdygo/rrweb-types';
+import type { ICrossOriginIframeMirror } from 'howdygo-rrweb-types';
 export default class CrossOriginIframeMirror
   implements ICrossOriginIframeMirror
 {

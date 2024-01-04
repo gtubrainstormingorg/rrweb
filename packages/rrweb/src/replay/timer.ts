@@ -3,7 +3,7 @@ import {
   eventWithTime,
   EventType,
   IncrementalSource,
-} from '@howdygo/rrweb-types';
+} from 'howdygo-rrweb-types';
 
 export class Timer {
   public timeOffset = 0;

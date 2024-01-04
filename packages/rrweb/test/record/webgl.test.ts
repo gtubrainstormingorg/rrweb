@@ -8,14 +8,14 @@ import {
   EventType,
   IncrementalSource,
   CanvasContext,
-} from '@howdygo/rrweb-types';
+} from 'howdygo-rrweb-types';
 import {
   assertSnapshot,
   launchPuppeteer,
   stripBase64,
   waitForRAF,
 } from '../utils';
-import type { ICanvas } from '@howdygo/rrweb-snapshot';
+import type { ICanvas } from 'howdygo-rrweb-snapshot';
 
 interface ISuite {
   code: string;
