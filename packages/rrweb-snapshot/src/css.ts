@@ -435,7 +435,7 @@ export function parse(css: string, options: ParserOptions = {}) {
     whitespace(); while(css[0] == '}'){ error('extra closing bracket'); css = css.slice(1); whitespace(); }
 
 		const m = match(/^(("(?:\\"|[^"])*"|'(?:\\'|[^'])*'|[^{])+)/);
-    if (!m || !m[0]) {
+    if (!m) {
       return;
     }
     /* @fix Remove all comments from selectors
