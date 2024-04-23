@@ -99,9 +99,7 @@ export function addHoverClass(cssText: string, cache: BuildCache): string {
     if ('selectors' in rule) {
       (rule.selectors || []).forEach((selector: string) => {
         if (HOVER_SELECTOR.test(selector)) {
-          if (areParenthesesBalanced(selector)) {
-            selectors.push(selector);
-          }
+          selectors.push(selector);
         }
       });
     }
