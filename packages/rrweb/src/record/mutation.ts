@@ -10,7 +10,7 @@ import {
   isNativeShadowDom,
   getInputType,
   toLowerCase,
-} from 'rrweb-snapshot';
+} from 'howdygo-rrweb-snapshot';
 import type { observerParam, MutationBufferParam } from '../types';
 import type {
   mutationRecord,
@@ -19,7 +19,8 @@ import type {
   removedNodeMutation,
   addedNodeMutation,
   Optional,
-} from '@rrweb/types';
+  IWindow,
+} from 'howdygo-rrweb-types';
 import {
   isBlocked,
   isAncestorRemoved,
@@ -331,6 +332,9 @@ export default class MutationBuffer {
         },
         onIframeLoad: (iframe, childSn) => {
           this.iframeManager.attachIframe(iframe, childSn);
+          if (iframe.contentWindow) {
+            this.canvasManager.addWindow(iframe.contentWindow as IWindow);
+          }
           this.shadowDomManager.observeAttachShadow(iframe);
         },
         onStylesheetLoad: (link, childSn) => {

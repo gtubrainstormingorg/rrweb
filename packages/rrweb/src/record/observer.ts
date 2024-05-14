@@ -4,7 +4,7 @@ import {
   Mirror,
   getInputType,
   toLowerCase,
-} from 'rrweb-snapshot';
+} from 'howdygo-rrweb-snapshot';
 import type { FontFaceSet } from 'css-font-loading-module';
 import {
   throttle,
@@ -47,7 +47,7 @@ import {
   SelectionRange,
   selectionCallback,
   customElementCallback,
-} from '@rrweb/types';
+} from 'howdygo-rrweb-types';
 import MutationBuffer from './mutation';
 import { callbackWrapper } from './error-handler';
 
@@ -296,11 +296,20 @@ function initMouseInteractionObserver({
       }
       const id = mirror.getId(target);
       const { clientX, clientY } = e;
+      let element: HTMLElement | null = null
+      if (target.nodeType === 1) {
+        element = target as HTMLElement;
+      } else {
+        // Use logic like the client to use parentElement if no element specified
+        element = target.parentElement;
+      }
       callbackWrapper(mouseInteractionCb)({
         type: MouseInteractions[thisEventKey],
         id,
         x: clientX,
         y: clientY,
+        xOffset: element ? clientX - (target as Element).getBoundingClientRect().left : undefined,
+        yOffset: element ? clientY - (target as Element).getBoundingClientRect().top : undefined,
         ...(pointerType !== null && { pointerType }),
       });
     };

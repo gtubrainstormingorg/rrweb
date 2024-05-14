@@ -3,7 +3,7 @@ import {
   MaskInputOptions,
   SlimDOMOptions,
   createMirror,
-} from 'rrweb-snapshot';
+} from 'howdygo-rrweb-snapshot';
 import { initObservers, mutationBuffers } from './observer';
 import {
   on,
@@ -27,7 +27,8 @@ import {
   scrollCallback,
   canvasMutationParam,
   adoptedStyleSheetParam,
-} from '@rrweb/types';
+  IWindow,
+} from 'howdygo-rrweb-types';
 import type { CrossOriginIframeMessageEventContent } from '../types';
 import { IframeManager } from './iframe-manager';
 import { ShadowDomManager } from './shadow-dom-manager';
@@ -200,7 +201,7 @@ function record<T = eventWithTime>(
       emit?.(eventProcessor(e), isCheckout);
     } else if (passEmitsToParent) {
       const message: CrossOriginIframeMessageEventContent<T> = {
-        type: 'rrweb',
+        type: 'howdygo-rrweb',
         event: eventProcessor(e),
         origin: window.location.origin,
         isCheckout,
@@ -380,6 +381,9 @@ function record<T = eventWithTime>(
       },
       onIframeLoad: (iframe, childSn) => {
         iframeManager.attachIframe(iframe, childSn);
+        if (iframe.contentWindow) {
+          canvasManager.addWindow(iframe.contentWindow as IWindow);
+        }
         shadowDomManager.observeAttachShadow(iframe);
       },
       onStylesheetLoad: (linkEl, childSn) => {

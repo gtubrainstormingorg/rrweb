@@ -1,13 +1,13 @@
-import type { Mirror, serializedNodeWithId } from 'rrweb-snapshot';
-import { genId, NodeType } from 'rrweb-snapshot';
+import type { Mirror, serializedNodeWithId } from 'howdygo-rrweb-snapshot';
+import { genId, NodeType } from 'howdygo-rrweb-snapshot';
 import type { CrossOriginIframeMessageEvent } from '../types';
 import CrossOriginIframeMirror from './cross-origin-iframe-mirror';
-import { EventType, IncrementalSource } from '@rrweb/types';
+import { EventType, IncrementalSource } from 'howdygo-rrweb-types';
 import type {
   eventWithTime,
   eventWithoutTime,
   mutationCallBack,
-} from '@rrweb/types';
+} from 'howdygo-rrweb-types';
 import type { StylesheetManager } from './stylesheet-manager';
 
 export class IframeManager {
@@ -89,7 +89,7 @@ export class IframeManager {
   private handleMessage(message: MessageEvent | CrossOriginIframeMessageEvent) {
     const crossOriginMessageEvent = message as CrossOriginIframeMessageEvent;
     if (
-      crossOriginMessageEvent.data.type !== 'rrweb' ||
+      crossOriginMessageEvent.data.type !== 'howdygo-rrweb' ||
       // To filter out the rrweb messages which are forwarded by some sites.
       crossOriginMessageEvent.origin !== crossOriginMessageEvent.data.origin
     )

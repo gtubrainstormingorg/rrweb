@@ -5,12 +5,12 @@ import type {
   MaskInputFn,
   MaskTextFn,
   DataURLOptions,
-} from 'rrweb-snapshot';
+} from 'howdygo-rrweb-snapshot';
 import type { PackFn, UnpackFn } from './packer/base';
 import type { IframeManager } from './record/iframe-manager';
 import type { ShadowDomManager } from './record/shadow-dom-manager';
 import type { Replayer } from './replay';
-import type { RRNode } from 'rrdom';
+import type { RRNode } from 'howdygo-rrdom';
 import type { CanvasManager } from './record/observers/canvas/canvas-manager';
 import type { StylesheetManager } from './record/stylesheet-manager';
 import type {
@@ -37,7 +37,7 @@ import type {
   styleDeclarationCallback,
   styleSheetRuleCallback,
   viewportResizeCallback,
-} from '@rrweb/types';
+} from 'howdygo-rrweb-types';
 import type ProcessedNodeManager from './record/processed-node-manager';
 
 export type recordOptions<T> = {
@@ -211,7 +211,7 @@ declare global {
 }
 
 export type CrossOriginIframeMessageEventContent<T = eventWithTime> = {
-  type: 'rrweb';
+  type: 'howdygo-rrweb';
   event: T;
   // The origin of the iframe which originally emits this message. It is used to check the integrity of message and to filter out the rrweb messages which are forwarded by some sites.
   origin: string;

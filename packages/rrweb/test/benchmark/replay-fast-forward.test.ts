@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as https from 'https';
-import type { eventWithTime } from '@rrweb/types';
+import type { eventWithTime } from 'howdygo-rrweb-types';
 import type { recordOptions } from '../../src/types';
 import { launchPuppeteer, ISuite } from '../utils';
 
@@ -71,7 +71,7 @@ const suites: Array<{
   {
     title: 'real events recorded on bugs.chromium.org',
     eventURL:
-      'https://raw.githubusercontent.com/rrweb-io/benchmark-events/main/rrdom-benchmark-1.json',
+      'https://raw.githubusercontent.com/rrweb-io/benchmark-events/main/howdygo-rrdom-benchmark-1.json',
     times: 3,
   },
 ];
