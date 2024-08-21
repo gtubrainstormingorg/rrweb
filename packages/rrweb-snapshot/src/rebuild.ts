@@ -518,6 +518,12 @@ export function buildNodeWithSN(
       }
     }
   }
+  
+  // Ensure we close the document to avoid the infinite load spinner
+  if (n.type === NodeType.Document) {
+    doc.close();
+    (node as Document).close();
+  }
 
   return node;
 }
