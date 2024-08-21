@@ -1,11 +1,11 @@
 # rrvideo
 
-## 2.0.0-alpha.19
+## 2.0.0-alpha.20
 
 ### Patch Changes
 
 - Updated dependencies []:
-  - rrweb-player@2.0.0-alpha.19
+  - rrweb-player@2.0.0-alpha.20
 
 ## 2.0.0-alpha.12
 
