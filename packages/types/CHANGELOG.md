@@ -1,5 +1,12 @@
 # @rrweb/types
 
+## 2.0.0-alpha.18
+
+### Patch Changes
+
+- Updated dependencies [[`02cc62d`](https://github.com/rrweb-io/rrweb/commit/02cc62dd44b52f579a332b55c49896a5cb7cc694), [`04ee6ed`](https://github.com/rrweb-io/rrweb/commit/04ee6eda57157f0e04f18f907d8f3e59ababc753), [`5fbb904`](https://github.com/rrweb-io/rrweb/commit/5fbb904edb653f3da17e6775ee438d81ef0bba83)]:
+  - rrweb-snapshot@2.0.0-alpha.18
+
 ## 2.0.0-alpha.17
 
 ### Minor Changes

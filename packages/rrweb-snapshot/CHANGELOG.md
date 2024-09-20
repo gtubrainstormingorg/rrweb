@@ -1,5 +1,15 @@
 # rrweb-snapshot
 
+## 2.0.0-alpha.18
+
+### Patch Changes
+
+- [#1331](https://github.com/rrweb-io/rrweb/pull/1331) [`02cc62d`](https://github.com/rrweb-io/rrweb/commit/02cc62dd44b52f579a332b55c49896a5cb7cc694) Thanks [@billyvg](https://github.com/billyvg)! - fix dimensions for blocked element not being applied
+
+- [#1535](https://github.com/rrweb-io/rrweb/pull/1535) [`04ee6ed`](https://github.com/rrweb-io/rrweb/commit/04ee6eda57157f0e04f18f907d8f3e59ababc753) Thanks [@eoghanmurray](https://github.com/eoghanmurray)! - Slight simplification to how we replace :hover after #1458
+
+- [#1437](https://github.com/rrweb-io/rrweb/pull/1437) [`5fbb904`](https://github.com/rrweb-io/rrweb/commit/5fbb904edb653f3da17e6775ee438d81ef0bba83) Thanks [@eoghanmurray](https://github.com/eoghanmurray)! - Edge case: Provide support for mutations on a <style> element which (unusually) has multiple text nodes
+
 ## 2.0.0-alpha.17
 
 ### Minor Changes
