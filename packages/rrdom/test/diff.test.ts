@@ -27,7 +27,10 @@ import {
   sameNodeType,
 } from '../src/diff';
 import type { IRRElement, IRRNode } from '../src/document';
-import type { canvasMutationData, styleSheetRuleData } from 'howdygo-rrweb-types';
+import type {
+  canvasMutationData,
+  styleSheetRuleData,
+} from 'howdygo-rrweb-types';
 import { EventType, IncrementalSource } from 'howdygo-rrweb-types';
 
 const elementSn = {

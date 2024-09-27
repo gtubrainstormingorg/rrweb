@@ -2,9 +2,7 @@ import {
   NodeType as RRNodeType,
   Mirror as NodeMirror,
 } from 'howdygo-rrweb-snapshot';
-import type {
-  elementNode,
-} from 'howdygo-rrweb-snapshot';
+import type { elementNode } from 'howdygo-rrweb-snapshot';
 import type {
   canvasMutationData,
   canvasEventWithTime,
@@ -86,7 +84,11 @@ export type ReplayerHandler = {
     target: HTMLCanvasElement,
   ) => void;
   applyInput: (data: inputData) => void;
-  applyScroll: (data: scrollData, isSync: boolean, forceScroll: boolean | undefined) => void;
+  applyScroll: (
+    data: scrollData,
+    isSync: boolean,
+    forceScroll: boolean | undefined,
+  ) => void;
   applyStyleSheetMutation: (
     data: styleDeclarationData | styleSheetRuleData,
     styleSheet: CSSStyleSheet,

@@ -3,7 +3,10 @@
  */
 import { EventType, IncrementalSource, Replayer, eventWithTime } from '../src';
 import { vi, type MockInstance } from 'vitest';
-import type { styleDeclarationData, styleSheetRuleData } from 'howdygo-rrweb-types';
+import type {
+  styleDeclarationData,
+  styleSheetRuleData,
+} from 'howdygo-rrweb-types';
 import { createMirror, Mirror as NodeMirror } from 'howdygo-rrweb-snapshot';
 import type { ReplayerHandler } from 'howdygo-rrdom';
 

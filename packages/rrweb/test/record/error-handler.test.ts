@@ -38,7 +38,10 @@ const setup = function (
   beforeAll(async () => {
     ctx.browser = await launchPuppeteer();
 
-    const bundlePath = path.resolve(__dirname, '../../dist/howdygo-rrweb.umd.cjs');
+    const bundlePath = path.resolve(
+      __dirname,
+      '../../dist/howdygo-rrweb.umd.cjs',
+    );
     ctx.code = fs.readFileSync(bundlePath, 'utf8');
   });
 

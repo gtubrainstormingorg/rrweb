@@ -147,7 +147,6 @@ describe('css splitter', () => {
     }
   });
 
-
   it('finds css textElement splits correctly when comments are present', () => {
     const window = new Window({ url: 'https://localhost:8080' });
     const document = window.document;
