@@ -1,7 +1,7 @@
 import {
   snapshot,
-  MaskInputOptions,
-  SlimDOMOptions,
+  type MaskInputOptions,
+  type SlimDOMOptions,
   createMirror,
 } from 'howdygo-rrweb-snapshot';
 import { initObservers, mutationBuffers } from './observer';
@@ -19,16 +19,16 @@ import {
 import type { recordOptions } from '../types';
 import {
   EventType,
-  eventWithoutTime,
-  eventWithTime,
+  type eventWithoutTime,
+  type eventWithTime,
   IncrementalSource,
-  listenerHandler,
-  mutationCallbackParam,
-  scrollCallback,
-  canvasMutationParam,
-  adoptedStyleSheetParam,
-  IWindow,
-  mousePosition,
+  type listenerHandler,
+  type mutationCallbackParam,
+  type scrollCallback,
+  type canvasMutationParam,
+  type adoptedStyleSheetParam,
+  type IWindow,
+  type mousePosition,
 } from 'howdygo-rrweb-types';
 import type { CrossOriginIframeMessageEventContent } from '../types';
 import { IframeManager } from './iframe-manager';
@@ -41,6 +41,7 @@ import {
   registerErrorHandler,
   unregisterErrorHandler,
 } from './error-handler';
+import dom from 'howdygo-rrweb-utils';
 
 let wrappedEmit!: (e: eventWithoutTime, isCheckout?: boolean) => void;
 
@@ -124,6 +125,11 @@ function record<T = eventWithTime>(
   if (inEmittingFrame && !emit) {
     throw new Error('emit function is required');
   }
+  if (!inEmittingFrame && !passEmitsToParent) {
+    return () => {
+      /* no-op since in this case we don't need to record anything from this frame in particular */
+    };
+  }
   // move departed options to new options
   if (mousemoveWait !== undefined && sampling.mousemove === undefined) {
     sampling.mousemove = mousemoveWait;
@@ -171,6 +177,7 @@ function record<T = eventWithTime>(
           // as they destroy some (hidden) info:
           headMetaAuthorship: _slimDOMOptions === 'all',
           headMetaDescKeywords: _slimDOMOptions === 'all',
+          headTitleMutations: _slimDOMOptions === 'all',
         }
       : _slimDOMOptions
       ? _slimDOMOptions
@@ -379,6 +386,7 @@ function record<T = eventWithTime>(
       inlineStylesheet,
       maskAllInputs: maskInputOptions,
       maskTextFn,
+      maskInputFn,
       slimDOM: slimDOMOptions,
       dataURLOptions,
       recordCanvas,
@@ -391,7 +399,8 @@ function record<T = eventWithTime>(
           stylesheetManager.trackLinkElement(n as HTMLLinkElement);
         }
         if (hasShadowRoot(n)) {
-          shadowDomManager.addShadowRoot(n.shadowRoot, document);
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          shadowDomManager.addShadowRoot(dom.shadowRoot(n as Node)!, document);
         }
       },
       onIframeLoad: (iframe, childSn) => {

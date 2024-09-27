@@ -11,7 +11,19 @@
       "howdygo-rrweb-player",
       "howdygo-rrweb-types",
       "howdygo-rrweb-web-extension",
-      "howdygo-rrvideo"
+      "howdygo-rrvideo",
+      "howdygo-rrweb-all",
+      "howdygo-rrweb-replay",
+      "howdygo-rrweb-record",
+      "howdygo-rrweb-packer",
+      "howdygo-rrweb-utils",
+      "howdygo-rrweb-web-extension",
+      "howdygo-rrweb-plugin-console-record",
+      "howdygo-rrweb-plugin-console-replay",
+      "howdygo-rrweb-plugin-sequential-id-record",
+      "howdygo-rrweb-plugin-sequential-id-replay",
+      "howdygo-rrweb-plugin-canvas-webrtc-record",
+      "howdygo-rrweb-plugin-canvas-webrtc-replay"
     ]
   ],
   "linked": [],

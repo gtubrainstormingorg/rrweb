@@ -567,7 +567,7 @@ export type inputValue = {
 
 export type inputCallback = (v: inputValue & { id: number }) => void;
 
-export const enum MediaInteractions {
+export enum MediaInteractions {
   Play,
   Pause,
   Seeked,
@@ -706,3 +706,7 @@ export type TakeTypedKeyValues<Obj extends object, Type> = Pick<
   Obj,
   TakeTypeHelper<Obj, Type>[keyof TakeTypeHelper<Obj, Type>]
 >;
+
+// Types for howdygo-rrweb-packer
+export type PackFn = (event: eventWithTime) => string;
+export type UnpackFn = (raw: string) => eventWithTime;

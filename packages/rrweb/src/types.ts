@@ -6,7 +6,6 @@ import type {
   MaskTextFn,
   DataURLOptions,
 } from 'howdygo-rrweb-snapshot';
-import type { PackFn, UnpackFn } from './packer/base';
 import type { IframeManager } from './record/iframe-manager';
 import type { ShadowDomManager } from './record/shadow-dom-manager';
 import type { Replayer } from './replay';
@@ -36,8 +35,12 @@ import type {
   selectionCallback,
   styleDeclarationCallback,
   styleSheetRuleCallback,
-  viewportResizeCallback,
+  viewportResizeCallback
 } from 'howdygo-rrweb-types';
+import type {
+  PackFn,
+  UnpackFn,
+} from '../typings/packer/base';
 import type ProcessedNodeManager from './record/processed-node-manager';
 
 export type recordOptions<T> = {
@@ -164,6 +167,7 @@ export type ReplayPlugin = {
   ) => void;
   getMirror?: (mirrors: { nodeMirror: Mirror }) => void;
 };
+export type { Replayer } from './replay';
 export type playerConfig = {
   speed: number;
   maxSpeed: number;

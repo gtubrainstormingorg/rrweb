@@ -1,19 +1,20 @@
 {
   "name": "howdygo-rrweb-snapshot",
-  "version": "2.0.0-alpha.19",
+  "version": "2.0.0-alpha.25",
   "description": "rrweb's component to take a snapshot of DOM, aka DOM serializer",
   "scripts": {
     "prepare": "npm run prepack",
-    "prepack": "npm run bundle && npm run typings",
-    "retest": "jest",
-    "test": "yarn bundle && yarn retest",
-    "test:watch": "jest --watch",
-    "test:update": "jest --updateSnapshot",
-    "bundle": "rollup --config",
-    "bundle:es-only": "cross-env ES_ONLY=true rollup --config",
-    "dev": "yarn bundle:es-only --watch",
-    "typings": "tsc -d --declarationDir typings",
-    "prepublish": "yarn typings && yarn bundle",
+    "prepack": "npm run build",
+    "retest": "vitest run",
+    "test": "yarn build && vitest run",
+    "test:watch": "vitest watch",
+    "retest:update": "vitest run --update",
+    "test:update": "yarn build && vitest run --update",
+    "bench": "vite build && vitest bench",
+    "dev": "vite build --watch",
+    "build": "yarn turbo prepublish -F howdygo-rrweb-snapshot",
+    "check-types": "tsc --noEmit",
+    "prepublish": "yarn check-types && vite build",
     "lint": "yarn eslint src"
   },
   "type": "module",
@@ -26,15 +27,25 @@
     "snapshot",
     "DOM"
   ],
-  "main": "lib/howdygo-rrweb-snapshot.cjs",
-  "module": "es/howdygo-rrweb-snapshot.js",
-  "unpkg": "dist/howdygo-rrweb-snapshot.js",
-  "typings": "typings/index.d.ts",
+  "main": "./dist/howdygo-rrweb-snapshot.umd.cjs",
+  "module": "./dist/howdygo-rrweb-snapshot.js",
+  "unpkg": "./dist/howdygo-rrweb-snapshot.umd.cjs",
+  "typings": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/howdygo-rrweb-snapshot.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/howdygo-rrweb-snapshot.umd.cjs"
+      }
+    }
+  },
   "files": [
     "dist",
-    "lib",
-    "es",
-    "typings"
+    "package.json"
   ],
   "author": "yanzhen@smartx.com",
   "license": "MIT",
@@ -43,21 +54,21 @@
   },
   "homepage": "https://github.com/rrweb-io/rrweb/tree/master/packages/howdygo-rrweb-snapshot#readme",
   "devDependencies": {
-    "@types/chai": "^4.1.4",
-    "@types/jest": "^27.0.2",
     "@types/jsdom": "^20.0.0",
     "@types/node": "^18.15.11",
-    "@types/puppeteer": "^1.12.4",
-    "cross-env": "^5.2.0",
-    "jest": "^27.2.4",
-    "jest-snapshot": "^23.6.0",
-    "jsdom": "^16.4.0",
+    "@types/postcss-safe-parser": "^5.0.4",
+    "@types/puppeteer": "^5.4.4",
+    "howdygo-rrweb-utils": "^2.0.0-alpha.25",
     "puppeteer": "^17.1.3",
-    "rollup": "^2.45.2",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-typescript2": "^0.31.2",
-    "ts-jest": "^27.0.5",
     "ts-node": "^7.0.1",
-    "tslib": "^1.9.3"
+    "tslib": "^1.9.3",
+    "typescript": "^5.4.5",
+    "vite": "^5.3.1",
+    "vite-plugin-dts": "^3.9.1",
+    "vitest": "^1.4.0"
+  },
+  "dependencies": {
+    "postcss": "^8.4.38",
+    "postcss-safe-parser": "^7.0.0"
   }
 }

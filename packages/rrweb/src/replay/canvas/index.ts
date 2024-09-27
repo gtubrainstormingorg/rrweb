@@ -1,9 +1,9 @@
 import type { Replayer } from '..';
 import {
   CanvasContext,
-  canvasMutationCommand,
-  canvasMutationData,
-  canvasMutationParam,
+  type canvasMutationCommand,
+  type canvasMutationData,
+  type canvasMutationParam,
 } from 'howdygo-rrweb-types';
 import webglMutation from './webgl';
 import canvas2DMutation from './2d';
