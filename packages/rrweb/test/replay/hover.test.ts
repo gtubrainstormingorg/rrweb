@@ -26,7 +26,10 @@ describe('replayer', function () {
   beforeAll(async () => {
     browser = await launchPuppeteer({ devtools: true });
 
-    const bundlePath = path.resolve(__dirname, '../../dist/howdygo-rrweb.umd.cjs');
+    const bundlePath = path.resolve(
+      __dirname,
+      '../../dist/howdygo-rrweb.umd.cjs',
+    );
     const stylePath = path.resolve(
       __dirname,
       '../../src/replay/styles/style.css',

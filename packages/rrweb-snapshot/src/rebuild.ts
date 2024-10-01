@@ -1,4 +1,8 @@
-import { fixCssBracketsAtRule, mediaSelectorPlugin, pseudoClassPlugin } from './css';
+import {
+  fixCssBracketsAtRule,
+  mediaSelectorPlugin,
+  pseudoClassPlugin,
+} from './css';
 import {
   type serializedNodeWithId,
   type serializedElementNodeWithId,
@@ -68,9 +72,10 @@ export function adaptCssForReplay(cssText: string, cache: BuildCache): string {
   const ast: { css: string } = postcss([
     mediaSelectorPlugin,
     pseudoClassPlugin,
-  ]).process(cssTextFix, 
+  ]).process(
+    cssTextFix,
     // @ts-ignore
-    { parser: postcssSafeParser }
+    { parser: postcssSafeParser },
   );
   const result = ast.css;
   cache?.stylesWithHoverClass.set(cssText, result);

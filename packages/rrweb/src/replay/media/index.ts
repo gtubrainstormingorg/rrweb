@@ -1,4 +1,8 @@
-import { type Emitter, MediaInteractions, ReplayerEvents } from 'howdygo-rrweb-types';
+import {
+  type Emitter,
+  MediaInteractions,
+  ReplayerEvents,
+} from 'howdygo-rrweb-types';
 import type { RRMediaElement } from 'howdygo-rrdom';
 import type { createPlayerService, createSpeedService } from '../machine';
 import type { Mirror, mediaAttributes } from 'howdygo-rrweb-snapshot';

@@ -98,7 +98,10 @@ const setup = function (
     ctx.serverB = await startServer();
     ctx.serverBURL = getServerURL(ctx.serverB);
 
-    const bundlePath = path.resolve(__dirname, '../../dist/howdygo-rrweb.umd.cjs');
+    const bundlePath = path.resolve(
+      __dirname,
+      '../../dist/howdygo-rrweb.umd.cjs',
+    );
     ctx.code = fs.readFileSync(bundlePath, 'utf8');
   });
 

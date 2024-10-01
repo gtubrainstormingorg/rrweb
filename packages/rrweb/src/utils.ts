@@ -10,7 +10,11 @@ import type {
   textMutation,
 } from 'howdygo-rrweb-types';
 import type { IMirror, Mirror, SlimDOMOptions } from 'howdygo-rrweb-snapshot';
-import { isShadowRoot, IGNORED_NODE, classMatchesRegex } from 'howdygo-rrweb-snapshot';
+import {
+  isShadowRoot,
+  IGNORED_NODE,
+  classMatchesRegex,
+} from 'howdygo-rrweb-snapshot';
 import { RRNode, RRIFrameElement, BaseRRNode } from 'howdygo-rrdom';
 import dom from 'howdygo-rrweb-utils';
 

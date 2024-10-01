@@ -236,13 +236,26 @@ export class CanvasManager {
 
           this.snapshotInProgressMap.set(id, true);
 
-          const blob: Blob = await new Promise((resolve) => canvas.toBlob(file => resolve(file!), options.dataURLOptions.type, options.dataURLOptions.quality));
+          const blob: Blob = await new Promise((resolve) =>
+            canvas.toBlob(
+              (file) => resolve(file!),
+              options.dataURLOptions.type,
+              options.dataURLOptions.quality,
+            ),
+          );
           const type = blob.type;
           const arrayBuffer = await blob.arrayBuffer();
           const base64 = encode(arrayBuffer); // cpu intensive // TODO in post processing
 
           this.snapshotInProgressMap.set(id, false);
-          if (!lastBlobMap.has(id) && (await getTransparentBlobFor(canvas.width, canvas.height, options.dataURLOptions)) === base64) {
+          if (
+            !lastBlobMap.has(id) &&
+            (await getTransparentBlobFor(
+              canvas.width,
+              canvas.height,
+              options.dataURLOptions,
+            )) === base64
+          ) {
             lastBlobMap.set(id, base64);
           }
           if (lastBlobMap.get(id) !== base64) {

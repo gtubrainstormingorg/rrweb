@@ -46,32 +46,35 @@ function fixCssBracketsAtRule(cssString: string): string {
 
   // Loop through all `@` rules in the CSS
   while ((match = atRuleRegex.exec(cssString)) !== null) {
-      // Extract the substring before the current `@` rule
-      const cssBeforeAtRule = cssString.substring(0, match.index);
+    // Extract the substring before the current `@` rule
+    const cssBeforeAtRule = cssString.substring(0, match.index);
 
-      // Check if there are unbalanced braces using a simple count
-      let openBracesCount = 0;
-      for (let char of cssBeforeAtRule) {
-          if (char === '{') openBracesCount++;
-          if (char === '}') openBracesCount--;
+    // Check if there are unbalanced braces using a simple count
+    let openBracesCount = 0;
+    for (let char of cssBeforeAtRule) {
+      if (char === '{') openBracesCount++;
+      if (char === '}') openBracesCount--;
+    }
+
+    // If there are more opening braces than closing braces, we need to close the block
+    if (openBracesCount > 0) {
+      // Find the point to insert the closing braces: directly before the `@` rule
+      let insertionPoint = match.index;
+
+      // Move the insertion point back to just after the last semicolon or closing brace
+      while (insertionPoint > 0 && /\s|;/.test(cssString[insertionPoint - 1])) {
+        insertionPoint--;
       }
 
-      // If there are more opening braces than closing braces, we need to close the block
-      if (openBracesCount > 0) {
-          // Find the point to insert the closing braces: directly before the `@` rule
-          let insertionPoint = match.index;
+      // Prepare the string to insert the necessary number of closing braces
+      const closingBraces = ' }'.repeat(openBracesCount);
 
-          // Move the insertion point back to just after the last semicolon or closing brace
-          while (insertionPoint > 0 && /\s|;/.test(cssString[insertionPoint - 1])) {
-              insertionPoint--;
-          }
-
-          // Prepare the string to insert the necessary number of closing braces
-          const closingBraces = ' }'.repeat(openBracesCount);
-
-          // Insert the closing braces at the calculated insertion point
-          cssString = `${cssString.substring(0, insertionPoint)}${closingBraces}${cssString.substring(insertionPoint)}`;
-      }
+      // Insert the closing braces at the calculated insertion point
+      cssString = `${cssString.substring(
+        0,
+        insertionPoint,
+      )}${closingBraces}${cssString.substring(insertionPoint)}`;
+    }
   }
 
   return cssString;
