@@ -1,4 +1,4 @@
-import { mediaSelectorPlugin, pseudoClassPlugin } from './css';
+import { fixCssBracketsAtRule, mediaSelectorPlugin, pseudoClassPlugin } from './css';
 import {
   type serializedNodeWithId,
   type serializedElementNodeWithId,
@@ -64,11 +64,11 @@ function getTagName(n: elementNode): string {
 export function adaptCssForReplay(cssText: string, cache: BuildCache): string {
   const cachedStyle = cache?.stylesWithHoverClass.get(cssText);
   if (cachedStyle) return cachedStyle;
-
+  const cssTextFix = fixCssBracketsAtRule(cssText);
   const ast: { css: string } = postcss([
     mediaSelectorPlugin,
     pseudoClassPlugin,
-  ]).process(cssText, 
+  ]).process(cssTextFix, 
     // @ts-ignore
     { parser: postcssSafeParser }
   );

@@ -219,6 +219,14 @@ ul li.specified c.\\:hover img {
       );
     });
 
+    it('can handle broken css', () => {
+      const cssText =
+        `:root { --example-var: { "Version": { "Build": "10.30.7.350828.20230224122352", "Source": "10.30.7.350828.1", "Required": "10.30.7.307232"; } }; @font-face { font-family: 'Calibri'; }`;
+      expect(adaptCssForReplay(cssText, cache)).toMatchCss(
+        `:root { --example-var: { "Version": { "Build": "10.30.7.350828.20230224122352", "Source": "10.30.7.350828.1", "Required": "10.30.7.307232"; } } }; @font-face { font-family: 'Calibri'; }`,
+      );
+    });
+
     // this benchmark is unreliable when run in parallel with other tests
     it.skip('benchmark', () => {
       const cssText = fs.readFileSync(
