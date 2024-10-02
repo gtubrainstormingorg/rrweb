@@ -47,7 +47,10 @@ describe('video', () => {
     serverURL = getServerURL(server);
     browser = await launchPuppeteer();
 
-    const bundlePath = path.resolve(__dirname, '../../dist/howdygo-rrweb.umd.cjs');
+    const bundlePath = path.resolve(
+      __dirname,
+      '../../dist/howdygo-rrweb.umd.cjs',
+    );
     code = fs.readFileSync(bundlePath, 'utf8');
   });
 
