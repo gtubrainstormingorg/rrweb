@@ -2783,13 +2783,6 @@
   dependencies:
     "@types/node" "*"
 
-"@types/postcss-safe-parser@^5.0.4":
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/@types/postcss-safe-parser/-/postcss-safe-parser-5.0.4.tgz#2913271fb07e62b8829753e809f011be967d6652"
-  integrity sha512-5zGTm1jsW3j4+omgND1SIDbrZOcigTuxa4ihppvKbLkg2INUGBHV/fWNRSRFibK084tU3fxqZ/kVoSIGqRHnrQ==
-  dependencies:
-    postcss "^8.4.4"
-
 "@types/prettier@2.7.3", "@types/prettier@^2.1.5":
   version "2.7.3"
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.7.3.tgz#3e51a17e291d01d17d3fc61422015a933af7a08f"
@@ -5903,6 +5896,11 @@ hosted-git-info@^2.1.4:
   resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.8.9.tgz#dffc0bf9a21c02209090f2aa69429e1414daf3f9"
   integrity sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==
 
+howdygo-postcss-safe-parser@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/howdygo-postcss-safe-parser/-/howdygo-postcss-safe-parser-7.0.1.tgz#a66a6ab97d104a6f71bdb7043321a373ac81b585"
+  integrity sha512-g6WJ6zBP2U027vBf4g312FM/HvK48tFl6AR4sQxEQdG1RmehrYzZjt6gFI28BYinLYyoVzvP8CwbCAjp56d31A==
+
 html-encoding-sniffer@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/html-encoding-sniffer/-/html-encoding-sniffer-2.0.1.tgz#42a6dc4fd33f00281176e8b23759ca4e4fa185f3"
@@ -8158,11 +8156,6 @@ picocolors@^1.0.0, picocolors@^1.0.1:
   resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-1.0.1.tgz#a8ad579b571952f0e5d25892de5445bcfe25aaa1"
   integrity sha512-anP1Z8qwhkbmu7MFP5iTt+wQKXgwzf7zTyGlcdzabySa9vd0Xt392U0rVmz9poOaBj0uHJKyyo9/upk0HrEQew==
 
-picocolors@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-1.1.0.tgz#5358b76a78cde483ba5cef6a9dc9671440b27d59"
-  integrity sha512-TQ92mBOW0l3LeMeyLV6mzy/kWr8lkd/hp3mTg7wYK7zJhuBStmGMBG0BdeDZS/dZx1IukaX6Bk11zcln25o1Aw==
-
 picomatch@^2.0.4, picomatch@^2.2.1, picomatch@^2.2.3, picomatch@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.3.1.tgz#3ba3833733646d9d3e4995946c1365a67fb07a42"
@@ -8243,11 +8236,6 @@ postcss-safe-parser@^6.0.0:
   resolved "https://registry.yarnpkg.com/postcss-safe-parser/-/postcss-safe-parser-6.0.0.tgz#bb4c29894171a94bc5c996b9a30317ef402adaa1"
   integrity sha512-FARHN8pwH+WiS2OPCxJI8FuRJpTVnn6ZNFiqAM2aeW2LwTHWWmWgIyKC6cUo0L8aeKiF/14MNvnpls6R2PBeMQ==
 
-postcss-safe-parser@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/postcss-safe-parser/-/postcss-safe-parser-7.0.0.tgz#6273d4e5149e286db5a45bc6cf6eafcad464014a"
-  integrity sha512-ovehqRNVCpuFzbXoTb4qLtyzK3xn3t/CUBxOs8LsnQjQrShaB4lKiHoVqY8ANaC0hBMHq5QVWk77rwGklFUDrg==
-
 postcss-scss@^4.0.9:
   version "4.0.9"
   resolved "https://registry.yarnpkg.com/postcss-scss/-/postcss-scss-4.0.9.tgz#a03c773cd4c9623cb04ce142a52afcec74806685"
@@ -8269,15 +8257,6 @@ postcss@^8.4.38:
     nanoid "^3.3.7"
     picocolors "^1.0.0"
     source-map-js "^1.2.0"
-
-postcss@^8.4.4:
-  version "8.4.47"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.47.tgz#5bf6c9a010f3e724c503bf03ef7947dcb0fea365"
-  integrity sha512-56rxCq7G/XfB4EkXq9Egn5GCqugWvDFjafDOThIdMBsI15iqPqR5r15TfSr1YPYeEI19YeaXMCbY6u88Y76GLQ==
-  dependencies:
-    nanoid "^3.3.7"
-    picocolors "^1.1.0"
-    source-map-js "^1.2.1"
 
 preferred-pm@^3.0.0:
   version "3.1.3"
@@ -9220,11 +9199,6 @@ source-map-js@^1.0.1, source-map-js@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.2.0.tgz#16b809c162517b5b8c3e7dcd315a2a5c2612b2af"
   integrity sha512-itJW8lvSA0TXEphiRoawsCksnlf8SyvmFzIhltqAHluXd88pkCd+cXJVHTDwdCr0IzwptSm035IHQktUu1QUMg==
-
-source-map-js@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.2.1.tgz#1ce5650fddd87abc099eda37dcff024c2667ae46"
-  integrity sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==
 
 source-map-support@0.5.21, source-map-support@^0.5.6:
   version "0.5.21"

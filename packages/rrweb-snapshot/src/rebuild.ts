@@ -1,4 +1,4 @@
-import { fixCssBracketsAtRule, mediaSelectorPlugin, pseudoClassPlugin } from './css';
+import { mediaSelectorPlugin, pseudoClassPlugin } from './css';
 import {
   type serializedNodeWithId,
   type serializedElementNodeWithId,
@@ -11,7 +11,7 @@ import {
 } from './types';
 import { isElement, Mirror, isNodeMetaEqual } from './utils';
 import postcss from 'postcss';
-import postcssSafeParser from 'postcss-safe-parser';
+import postcssSafeParser from 'howdygo-postcss-safe-parser';
 
 const tagMap: tagMap = {
   script: 'noscript',
@@ -64,11 +64,10 @@ function getTagName(n: elementNode): string {
 export function adaptCssForReplay(cssText: string, cache: BuildCache): string {
   const cachedStyle = cache?.stylesWithHoverClass.get(cssText);
   if (cachedStyle) return cachedStyle;
-  const cssTextFix = fixCssBracketsAtRule(cssText);
   const ast: { css: string } = postcss([
     mediaSelectorPlugin,
     pseudoClassPlugin,
-  ]).process(cssTextFix, 
+  ]).process(cssText, 
     // @ts-ignore
     { parser: postcssSafeParser }
   );

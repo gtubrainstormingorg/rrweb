@@ -1,6 +1,6 @@
 {
   "name": "howdygo-rrweb-snapshot",
-  "version": "2.0.0-alpha.25",
+  "version": "2.0.0-alpha.27",
   "description": "rrweb's component to take a snapshot of DOM, aka DOM serializer",
   "scripts": {
     "prepare": "npm run prepack",
@@ -56,9 +56,8 @@
   "devDependencies": {
     "@types/jsdom": "^20.0.0",
     "@types/node": "^18.15.11",
-    "@types/postcss-safe-parser": "^5.0.4",
     "@types/puppeteer": "^5.4.4",
-    "howdygo-rrweb-utils": "^2.0.0-alpha.25",
+    "howdygo-rrweb-utils": "^2.0.0-alpha.27",
     "puppeteer": "^17.1.3",
     "ts-node": "^7.0.1",
     "tslib": "^1.9.3",
@@ -69,6 +68,6 @@
   },
   "dependencies": {
     "postcss": "^8.4.38",
-    "postcss-safe-parser": "^7.0.0"
+    "howdygo-postcss-safe-parser": "^7.0.1"
   }
 }
