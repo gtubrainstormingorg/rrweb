@@ -67,10 +67,7 @@ export function adaptCssForReplay(cssText: string, cache: BuildCache): string {
   const ast: { css: string } = postcss([
     mediaSelectorPlugin,
     pseudoClassPlugin,
-  ]).process(
-    cssText,
-    { parser: postcssSafeParser },
-  );
+  ]).process(cssText, { parser: postcssSafeParser });
   const result = ast.css;
   cache?.stylesWithHoverClass.set(cssText, result);
   return result;
