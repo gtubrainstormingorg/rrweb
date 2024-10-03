@@ -69,7 +69,6 @@ export function adaptCssForReplay(cssText: string, cache: BuildCache): string {
     pseudoClassPlugin,
   ]).process(
     cssText,
-    // @ts-ignore
     { parser: postcssSafeParser },
   );
   const result = ast.css;
