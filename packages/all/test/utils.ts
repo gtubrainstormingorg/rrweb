@@ -24,7 +24,7 @@ export async function launchPuppeteer(
       width: 1920,
       height: 1080,
     },
-    args: ['--no-sandbox'],
+    args: ['--no-sandbox', '--window-size=1920,1080'],
     ...options,
   });
 }
