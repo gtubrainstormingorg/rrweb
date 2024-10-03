@@ -36,8 +36,9 @@ import type {
   styleDeclarationCallback,
   styleSheetRuleCallback,
   viewportResizeCallback,
+  PackFn,
+  UnpackFn,
 } from 'howdygo-rrweb-types';
-import type { PackFn, UnpackFn } from '../typings/packer/base';
 import type ProcessedNodeManager from './record/processed-node-manager';
 
 export type recordOptions<T> = {
