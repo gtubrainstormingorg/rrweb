@@ -338,6 +338,8 @@ export class Replayer {
       this.mirror.reset();
       this.styleMirror.reset();
       this.mediaManager.reset();
+      // TODO remove this
+      this.canvasEventMap.clear();
     });
 
     const timer = new Timer([], {
