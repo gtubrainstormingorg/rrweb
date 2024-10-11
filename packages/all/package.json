@@ -1,6 +1,6 @@
 {
   "name": "howdygo-rrweb-all",
-  "version": "2.0.0-alpha.28",
+  "version": "2.0.0-alpha.29",
   "publishConfig": {
     "access": "public"
   },
@@ -56,9 +56,9 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "howdygo-rrweb-types": "^2.0.0-alpha.28",
-    "howdygo-rrweb-packer": "^2.0.0-alpha.28",
-    "howdygo-rrweb": "^2.0.0-alpha.28"
+    "howdygo-rrweb-types": "^2.0.0-alpha.29",
+    "howdygo-rrweb-packer": "^2.0.0-alpha.29",
+    "howdygo-rrweb": "^2.0.0-alpha.29"
   },
   "browserslist": [
     "supports es6-class"
