@@ -50,7 +50,10 @@ export default async function canvasMutation({
       const args = await Promise.all(mutationArgsPromises);
 
       // Step 2: Check for cancellation before applying mutations
-      if (activeMutations.has(id) && activeMutations.get(id)?.get(executionId)?.cancelled) {
+      if (
+        activeMutations.has(id) &&
+        activeMutations.get(id)?.get(executionId)?.cancelled
+      ) {
         return; // Skip mutation application
       }
 
