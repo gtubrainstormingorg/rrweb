@@ -87,7 +87,7 @@ import {
 import getInjectStyleRules from './styles/inject-style';
 import './styles/style.css';
 import canvasMutation from './canvas';
-import { deserializeArg } from './canvas/deserialize-args';
+// import { deserializeArg } from './canvas/deserialize-args';
 import { MediaManager } from './media';
 import { applyDialogToTopLevel, removeDialogFromTopLevel } from './dialog';
 
@@ -338,8 +338,6 @@ export class Replayer {
       this.mirror.reset();
       this.styleMirror.reset();
       this.mediaManager.reset();
-      // TODO remove this
-      this.canvasEventMap.clear();
     });
 
     const timer = new Timer([], {
@@ -868,9 +866,10 @@ export class Replayer {
     if (!isSync) {
       this.waitForStylesheetLoad();
     }
-    if (this.config.UNSAFE_replayCanvas) {
-      void this.preloadAllImages();
-    }
+    // TODO remove in a nicer manner
+    // if (this.config.UNSAFE_replayCanvas) {
+    //   void this.preloadAllImages();
+    // }
   }
 
   private insertStyleRules(
@@ -1049,66 +1048,67 @@ export class Replayer {
   /**
    * pause when there are some canvas drawImage args need to be loaded
    */
-  private async preloadAllImages(): Promise<void[]> {
-    const promises: Promise<void>[] = [];
-    for (const event of this.service.state.context.events) {
-      if (
-        event.type === EventType.IncrementalSnapshot &&
-        event.data.source === IncrementalSource.CanvasMutation
-      ) {
-        promises.push(
-          this.deserializeAndPreloadCanvasEvents(event.data, event),
-        );
-        const commands =
-          'commands' in event.data ? event.data.commands : [event.data];
-        commands.forEach((c) => {
-          this.preloadImages(c, event);
-        });
-      }
-    }
-    return Promise.all(promises);
-  }
+  // private async preloadAllImages(): Promise<void[]> {
+  //   const promises: Promise<void>[] = [];
+  //   for (const event of this.service.state.context.events) {
+  //     if (
+  //       event.type === EventType.IncrementalSnapshot &&
+  //       event.data.source === IncrementalSource.CanvasMutation
+  //     ) {
+  //       promises.push(
+  //         this.deserializeAndPreloadCanvasEvents(event.data, event),
+  //       );
+  //       const commands =
+  //         'commands' in event.data ? event.data.commands : [event.data];
+  //       commands.forEach((c) => {
+  //         this.preloadImages(c, event);
+  //       });
+  //     }
+  //   }
+  //   return Promise.all(promises);
+  // }
 
-  private preloadImages(data: canvasMutationCommand, event: eventWithTime) {
-    if (
-      data.property === 'drawImage' &&
-      typeof data.args[0] === 'string' &&
-      !this.imageMap.has(event)
-    ) {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const imgd = ctx?.createImageData(canvas.width, canvas.height);
-      ctx?.putImageData(imgd!, 0, 0);
-    }
-  }
-  private async deserializeAndPreloadCanvasEvents(
-    data: canvasMutationData,
-    event: eventWithTime,
-  ) {
-    if (!this.canvasEventMap.has(event)) {
-      const status = {
-        isUnchanged: true,
-      };
-      if ('commands' in data) {
-        const commands = await Promise.all(
-          data.commands.map(async (c) => {
-            const args = await Promise.all(
-              c.args.map(deserializeArg(this.imageMap, null, status)),
-            );
-            return { ...c, args };
-          }),
-        );
-        if (status.isUnchanged === false)
-          this.canvasEventMap.set(event, { ...data, commands });
-      } else {
-        const args = await Promise.all(
-          data.args.map(deserializeArg(this.imageMap, null, status)),
-        );
-        if (status.isUnchanged === false)
-          this.canvasEventMap.set(event, { ...data, args });
-      }
-    }
-  }
+  // private preloadImages(data: canvasMutationCommand, event: eventWithTime) {
+  //   if (
+  //     data.property === 'drawImage' &&
+  //     typeof data.args[0] === 'string' &&
+  //     !this.imageMap.has(event)
+  //   ) {
+  //     const canvas = document.createElement('canvas');
+  //     const ctx = canvas.getContext('2d');
+  //     const imgd = ctx?.createImageData(canvas.width, canvas.height);
+  //     ctx?.putImageData(imgd!, 0, 0);
+  //   }
+  // }
+
+  // private async deserializeAndPreloadCanvasEvents(
+  //   data: canvasMutationData,
+  //   event: eventWithTime,
+  // ) {
+  //   if (!this.canvasEventMap.has(event)) {
+  //     const status = {
+  //       isUnchanged: true,
+  //     };
+  //     if ('commands' in data) {
+  //       const commands = await Promise.all(
+  //         data.commands.map(async (c) => {
+  //           const args = await Promise.all(
+  //             c.args.map(deserializeArg(this.imageMap, null, status)),
+  //           );
+  //           return { ...c, args };
+  //         }),
+  //       );
+  //       if (status.isUnchanged === false)
+  //         this.canvasEventMap.set(event, { ...data, commands });
+  //     } else {
+  //       const args = await Promise.all(
+  //         data.args.map(deserializeArg(this.imageMap, null, status)),
+  //       );
+  //       if (status.isUnchanged === false)
+  //         this.canvasEventMap.set(event, { ...data, args });
+  //     }
+  //   }
+  // }
 
   private applyIncremental(
     e: incrementalSnapshotEvent & { timestamp: number; delay?: number },

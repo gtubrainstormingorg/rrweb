@@ -263,6 +263,7 @@ export class CanvasManager {
               id,
               type: CanvasContext['2D'],
               commands: [
+                // TODO this can potentially get removed
                 {
                   property: 'clearRect', // wipe canvas
                   args: [0, 0, canvas.width, canvas.height],
