@@ -3,7 +3,10 @@ import type { canvasMutationCommand } from 'howdygo-rrweb-types';
 import { deserializeArg } from './deserialize-args';
 
 // A map to track active mutation promises by `id`
-const activeCanvasMutations = new Map<Number, Map<string, { cancelled: boolean }>>();
+const activeCanvasMutations = new Map<
+  Number,
+  Map<string, { cancelled: boolean }>
+>();
 
 export default async function canvasMutation({
   event,
@@ -28,7 +31,9 @@ export default async function canvasMutation({
   }
 
   // Create a unique execution ID (using timestamp and random string)
-  const executionId = `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+  const executionId = `${Date.now()}-${Math.random()
+    .toString(36)
+    .slice(2, 11)}`;
 
   // Initialize the map for this `id` if it doesn't exist
   if (!activeCanvasMutations.has(id)) {
