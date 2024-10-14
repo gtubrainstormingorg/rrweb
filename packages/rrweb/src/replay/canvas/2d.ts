@@ -3,7 +3,7 @@ import type { canvasMutationCommand } from 'howdygo-rrweb-types';
 import { deserializeArg } from './deserialize-args';
 
 // A map to track active mutation promises by `id`
-const activeMutations = new Map<Number, Map<number, { cancelled: boolean }>>();
+const activeCanvasMutations = new Map<Number, Map<string, { cancelled: boolean }>>();
 
 export default async function canvasMutation({
   event,
@@ -27,16 +27,16 @@ export default async function canvasMutation({
     return;
   }
 
-  // Create a unique execution ID (using timestamp)
-  const executionId = Date.now();
+  // Create a unique execution ID (using timestamp and random string)
+  const executionId = `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 
   // Initialize the map for this `id` if it doesn't exist
-  if (!activeMutations.has(id)) {
-    activeMutations.set(id, new Map<number, { cancelled: boolean }>());
+  if (!activeCanvasMutations.has(id)) {
+    activeCanvasMutations.set(id, new Map<string, { cancelled: boolean }>());
   }
 
   // Add this specific execution to the map and mark it as active
-  activeMutations.get(id)?.set(executionId, { cancelled: false });
+  activeCanvasMutations.get(id)?.set(executionId, { cancelled: false });
 
   const mutationPromise = (async () => {
     try {
@@ -50,7 +50,7 @@ export default async function canvasMutation({
       const args = await Promise.all(mutationArgsPromises);
 
       // Step 2: Check for cancellation before applying mutations
-      if (activeMutations.has(id) && activeMutations.get(id)?.get(executionId)?.cancelled) {
+      if (activeCanvasMutations.has(id) && activeCanvasMutations.get(id)?.get(executionId)?.cancelled) {
         return; // Skip mutation application
       }
 
@@ -88,7 +88,7 @@ export default async function canvasMutation({
   })();
 
   // If a new mutation for this `id` is started, mark this execution as cancelled
-  activeMutations.get(id)?.forEach((value, key) => {
+  activeCanvasMutations.get(id)?.forEach((value, key) => {
     if (key !== executionId) {
       value.cancelled = true;
     }
@@ -98,10 +98,10 @@ export default async function canvasMutation({
   await mutationPromise;
 
   // Clean up: Remove the mutation from the map when done
-  activeMutations.get(id)?.delete(executionId);
+  activeCanvasMutations.get(id)?.delete(executionId);
 
   // If no more executions are active for this `id`, remove the entry
-  if (activeMutations.get(id)?.size === 0) {
-    activeMutations.delete(id);
+  if (activeCanvasMutations.get(id)?.size === 0) {
+    activeCanvasMutations.delete(id);
   }
 }
