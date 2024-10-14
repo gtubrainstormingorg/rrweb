@@ -1,10 +1,10 @@
 import type { Replayer } from '..';
 import {
   CanvasContext,
-  canvasMutationCommand,
-  canvasMutationData,
-  canvasMutationParam,
-} from '@rrweb/types';
+  type canvasMutationCommand,
+  type canvasMutationData,
+  type canvasMutationParam,
+} from 'howdygo-rrweb-types';
 import webglMutation from './webgl';
 import canvas2DMutation from './2d';
 
@@ -46,11 +46,13 @@ export default async function canvasMutation({
       return;
     }
     // default is '2d' for backwards compatibility (rrweb below 1.1.x)
+    const id = mutation.id;
     await canvas2DMutation({
       event,
       mutations: commands,
       target,
       imageMap,
+      id,
       errorHandler,
     });
   } catch (error) {

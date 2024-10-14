@@ -1,9 +1,9 @@
 import {
   snapshot,
-  MaskInputOptions,
-  SlimDOMOptions,
+  type MaskInputOptions,
+  type SlimDOMOptions,
   createMirror,
-} from 'rrweb-snapshot';
+} from 'howdygo-rrweb-snapshot';
 import { initObservers, mutationBuffers } from './observer';
 import {
   on,
@@ -19,15 +19,17 @@ import {
 import type { recordOptions } from '../types';
 import {
   EventType,
-  eventWithoutTime,
-  eventWithTime,
+  type eventWithoutTime,
+  type eventWithTime,
   IncrementalSource,
-  listenerHandler,
-  mutationCallbackParam,
-  scrollCallback,
-  canvasMutationParam,
-  adoptedStyleSheetParam,
-} from '@rrweb/types';
+  type listenerHandler,
+  type mutationCallbackParam,
+  type scrollCallback,
+  type canvasMutationParam,
+  type adoptedStyleSheetParam,
+  type IWindow,
+  type mousePosition,
+} from 'howdygo-rrweb-types';
 import type { CrossOriginIframeMessageEventContent } from '../types';
 import { IframeManager } from './iframe-manager';
 import { ShadowDomManager } from './shadow-dom-manager';
@@ -39,12 +41,27 @@ import {
   registerErrorHandler,
   unregisterErrorHandler,
 } from './error-handler';
+import dom from 'howdygo-rrweb-utils';
 
 let wrappedEmit!: (e: eventWithoutTime, isCheckout?: boolean) => void;
 
 let takeFullSnapshot!: (isCheckout?: boolean) => void;
 let canvasManager!: CanvasManager;
 let recording = false;
+
+// Multiple tools (i.e. MooTools, Prototype.js) override Array.from and drop support for the 2nd parameter
+// Try to pull a clean implementation from a newly created iframe
+try {
+  if (Array.from([1], (x) => x * 2)[0] !== 2) {
+    const cleanFrame = document.createElement('iframe');
+    document.body.appendChild(cleanFrame);
+    // eslint-disable-next-line @typescript-eslint/unbound-method -- Array.from is static and doesn't rely on binding
+    Array.from = cleanFrame.contentWindow?.Array.from || Array.from;
+    document.body.removeChild(cleanFrame);
+  }
+} catch (err) {
+  console.debug('Unable to override Array.from', err);
+}
 
 const mirror = createMirror();
 function record<T = eventWithTime>(
@@ -108,6 +125,11 @@ function record<T = eventWithTime>(
   if (inEmittingFrame && !emit) {
     throw new Error('emit function is required');
   }
+  if (!inEmittingFrame && !passEmitsToParent) {
+    return () => {
+      /* no-op since in this case we don't need to record anything from this frame in particular */
+    };
+  }
   // move departed options to new options
   if (mousemoveWait !== undefined && sampling.mousemove === undefined) {
     sampling.mousemove = mousemoveWait;
@@ -155,6 +177,7 @@ function record<T = eventWithTime>(
           // as they destroy some (hidden) info:
           headMetaAuthorship: _slimDOMOptions === 'all',
           headMetaDescKeywords: _slimDOMOptions === 'all',
+          headTitleMutations: _slimDOMOptions === 'all',
         }
       : _slimDOMOptions
       ? _slimDOMOptions
@@ -200,7 +223,7 @@ function record<T = eventWithTime>(
       emit?.(eventProcessor(e), isCheckout);
     } else if (passEmitsToParent) {
       const message: CrossOriginIframeMessageEventContent<T> = {
-        type: 'rrweb',
+        type: 'howdygo-rrweb',
         event: eventProcessor(e),
         origin: window.location.origin,
         isCheckout,
@@ -363,6 +386,7 @@ function record<T = eventWithTime>(
       inlineStylesheet,
       maskAllInputs: maskInputOptions,
       maskTextFn,
+      maskInputFn,
       slimDOM: slimDOMOptions,
       dataURLOptions,
       recordCanvas,
@@ -375,11 +399,15 @@ function record<T = eventWithTime>(
           stylesheetManager.trackLinkElement(n as HTMLLinkElement);
         }
         if (hasShadowRoot(n)) {
-          shadowDomManager.addShadowRoot(n.shadowRoot, document);
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          shadowDomManager.addShadowRoot(dom.shadowRoot(n as Node)!, document);
         }
       },
       onIframeLoad: (iframe, childSn) => {
         iframeManager.attachIframe(iframe, childSn);
+        if (iframe.contentWindow) {
+          canvasManager.addWindow(iframe.contentWindow as IWindow);
+        }
         shadowDomManager.observeAttachShadow(iframe);
       },
       onStylesheetLoad: (linkEl, childSn) => {
@@ -419,7 +447,7 @@ function record<T = eventWithTime>(
       return callbackWrapper(initObservers)(
         {
           mutationCb: wrappedMutationEmit,
-          mousemoveCb: (positions, source) =>
+          mousemoveCb: (positions: mousePosition[], source) =>
             wrappedEmit({
               type: EventType.IncrementalSnapshot,
               data: {

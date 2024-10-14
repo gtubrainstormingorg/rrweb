@@ -1,12 +1,12 @@
 /**
- * @jest-environment jsdom
+ * @vitest-environment jsdom
  */
-
+import { vi } from 'vitest';
 import { polyfillWebGLGlobals } from '../utils';
 polyfillWebGLGlobals();
 
 import webglMutation from '../../src/replay/canvas/webgl';
-import { CanvasContext } from '@rrweb/types';
+import { CanvasContext } from 'howdygo-rrweb-types';
 import { variableListFor } from '../../src/replay/canvas/deserialize-args';
 
 let canvas: HTMLCanvasElement;
@@ -15,17 +15,17 @@ describe('webglMutation', () => {
     canvas = document.createElement('canvas');
   });
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should create webgl variables', async () => {
-    const createShaderMock = jest.fn().mockImplementation(() => {
+    const createShaderMock = vi.fn().mockImplementation(() => {
       return new WebGLShader();
     });
     const context = {
       createShader: createShaderMock,
     } as unknown as WebGLRenderingContext;
-    jest.spyOn(canvas, 'getContext').mockImplementation(() => {
+    vi.spyOn(canvas, 'getContext').mockImplementation(() => {
       return context;
     });
 

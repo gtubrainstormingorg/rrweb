@@ -1,15 +1,36 @@
 /**
- * @jest-environment jsdom
+ * @vitest-environment jsdom
  */
 import * as fs from 'fs';
 import * as path from 'path';
+import { beforeEach, describe, expect as _expect, it } from 'vitest';
 import {
   adaptCssForReplay,
   buildNodeWithSN,
   createCache,
 } from '../src/rebuild';
 import { NodeType } from '../src/types';
-import { createMirror, Mirror } from '../src/utils';
+import { createMirror, Mirror, normalizeCssString } from '../src/utils';
+
+const expect = _expect as unknown as {
+  <T = unknown>(actual: T): {
+    toMatchCss(expected: string): void;
+  } & ReturnType<typeof _expect>;
+} & typeof _expect;
+
+expect.extend({
+  toMatchCss: function (received: string, expected: string) {
+    const pass = normalizeCssString(received) === normalizeCssString(expected);
+    const message: () => string = () =>
+      pass
+        ? ''
+        : `Received (${received}) is not the same as expected (${expected})`;
+    return {
+      message,
+      pass,
+    };
+  },
+});
 
 function getDuration(hrtime: [number, number]) {
   const [seconds, nanoseconds] = hrtime;
@@ -51,6 +72,32 @@ describe('rebuild', function () {
     });
   });
 
+  describe('rr_width/rr_height', function () {
+    it('rebuild blocked element with correct dimensions', function () {
+      const node = buildNodeWithSN(
+        {
+          id: 1,
+          tagName: 'svg',
+          type: NodeType.Element,
+          isSVG: true,
+          attributes: {
+            rr_width: '50px',
+            rr_height: '50px',
+          },
+          childNodes: [],
+        },
+        {
+          doc: document,
+          mirror,
+          hackCss: false,
+          cache,
+        },
+      ) as HTMLDivElement;
+      expect(node.style.width).toBe('50px');
+      expect(node.style.height).toBe('50px');
+    });
+  });
+
   describe('shadowDom', function () {
     it('rebuild shadowRoot without siblings', function () {
       const node = buildNodeWithSN(
@@ -85,19 +132,19 @@ describe('rebuild', function () {
   describe('add hover class to hover selector related rules', function () {
     it('will do nothing to css text without :hover', () => {
       const cssText = 'body { color: white }';
-      expect(adaptCssForReplay(cssText, cache)).toEqual(cssText);
+      expect(adaptCssForReplay(cssText, cache)).toMatchCss(cssText);
     });
 
     it('can add hover class to css text', () => {
       const cssText = '.a:hover { color: white }';
-      expect(adaptCssForReplay(cssText, cache)).toEqual(
+      expect(adaptCssForReplay(cssText, cache)).toMatchCss(
         '.a:hover, .a.\\:hover { color: white }',
       );
     });
 
     it('can correctly add hover when in middle of selector', () => {
       const cssText = 'ul li a:hover img { color: white }';
-      expect(adaptCssForReplay(cssText, cache)).toEqual(
+      expect(adaptCssForReplay(cssText, cache)).toMatchCss(
         'ul li a:hover img, ul li a.\\:hover img { color: white }',
       );
     });
@@ -110,14 +157,15 @@ img,
 ul li.specified c:hover img {
   color: white
 }`;
-      expect(adaptCssForReplay(cssText, cache)).toEqual(
-        `ul li.specified a:hover img, ul li.specified a.\\:hover img,
+      expect(adaptCssForReplay(cssText, cache)).toMatchCss(
+        `ul li.specified a:hover img,
 ul li.multiline
 b:hover
-img, ul li.multiline
-b.\\:hover
 img,
-ul li.specified c:hover img, ul li.specified c.\\:hover img {
+ul li.specified c:hover img,
+ul li.specified a.\\:hover img,
+ul li.multiline b.\\:hover img,
+ul li.specified c.\\:hover img {
   color: white
 }`,
       );
@@ -125,49 +173,63 @@ ul li.specified c:hover img, ul li.specified c.\\:hover img {
 
     it('can add hover class within media query', () => {
       const cssText = '@media screen { .m:hover { color: white } }';
-      expect(adaptCssForReplay(cssText, cache)).toEqual(
+      expect(adaptCssForReplay(cssText, cache)).toMatchCss(
         '@media screen { .m:hover, .m.\\:hover { color: white } }',
       );
     });
 
     it('can add hover class when there is multi selector', () => {
       const cssText = '.a, .b:hover, .c { color: white }';
-      expect(adaptCssForReplay(cssText, cache)).toEqual(
-        '.a, .b:hover, .b.\\:hover, .c { color: white }',
+      expect(adaptCssForReplay(cssText, cache)).toMatchCss(
+        '.a, .b:hover, .c, .b.\\:hover { color: white }',
       );
     });
 
     it('can add hover class when there is a multi selector with the same prefix', () => {
       const cssText = '.a:hover, .a:hover::after { color: white }';
-      expect(adaptCssForReplay(cssText, cache)).toEqual(
-        '.a:hover, .a.\\:hover, .a:hover::after, .a.\\:hover::after { color: white }',
+      expect(adaptCssForReplay(cssText, cache)).toMatchCss(
+        '.a:hover, .a:hover::after, .a.\\:hover, .a.\\:hover::after { color: white }',
       );
     });
 
     it('can add hover class when :hover is not the end of selector', () => {
       const cssText = 'div:hover::after { color: white }';
-      expect(adaptCssForReplay(cssText, cache)).toEqual(
+      expect(adaptCssForReplay(cssText, cache)).toMatchCss(
         'div:hover::after, div.\\:hover::after { color: white }',
       );
     });
 
     it('can add hover class when the selector has multi :hover', () => {
       const cssText = 'a:hover b:hover { color: white }';
-      expect(adaptCssForReplay(cssText, cache)).toEqual(
+      expect(adaptCssForReplay(cssText, cache)).toMatchCss(
         'a:hover b:hover, a.\\:hover b.\\:hover { color: white }',
       );
     });
 
     it('will ignore :hover in css value', () => {
       const cssText = '.a::after { content: ":hover" }';
-      expect(adaptCssForReplay(cssText, cache)).toEqual(cssText);
+      expect(adaptCssForReplay(cssText, cache)).toMatchCss(cssText);
     });
 
     it('can adapt media rules to replay context', () => {
       const cssText =
         '@media only screen and (min-device-width : 1200px) { .a { width: 10px; }}';
-      expect(adaptCssForReplay(cssText, cache)).toEqual(
+      expect(adaptCssForReplay(cssText, cache)).toMatchCss(
         '@media only screen and (min-width : 1200px) { .a { width: 10px; }}',
+      );
+    });
+
+    it('can handle broken css', () => {
+      const cssText = `:root { --example-var: { "Version": { "Build": "10.30.7.350828.20230224122352", "Source": "10.30.7.350828.1", "Required": "10.30.7.307232"; } } } @font-face { font-family: 'Calibri'; }`;
+      expect(adaptCssForReplay(cssText, cache)).toMatchCss(
+        `:root { --example-var: { "Version": { "Build": "10.30.7.350828.20230224122352", "Source": "10.30.7.350828.1", "Required": "10.30.7.307232"; } } }; @font-face { font-family: 'Calibri'; }`,
+      );
+    });
+
+    it('can handle more broken css', () => {
+      const cssText = `.sapThemeMetaData-UR-ls { background-image: url(\"https://cached-assets.howdygo.com/NWSRNMKs2gbuMpcwprO55nP9gp7Vfg3eqdiVRkwXXN8\"); }:root { --sapThemeMetaData-UR-ls: {\"Path\": \"UR.ls.sap_fiori_3.standards\", \"PathPattern\": \"/%frameworkId%/%libId%/%themeId%/%fileId%.css\", \"Extends\": [\"sap_base_fiori\",\"baseTheme\"], \"Tags\": [\"Fiori_3\",\"Touch\"], \"Scopes\": [\"lsCondensed\",\"lsScope--fioripaddings\"], \"Engine\": {\"Name\": \"theming-engine\", \"Version\": \"1.73.0\"}, \"Version\": { \"Build\": \"10.30.7.350828.20230224122352\", \"Source\": \"10.30.7.350828.1\", \"Required\": \"10.30.7.307232\"}}; } @font-face { font-family: SAP-icons; src: url(\"https://cached-assets.howdygo.com/FiD_UCYglUKNaic1GWjVsdo1vH1SoepXUAu-4DZCMYo\") format(\"woff2\"), url(\"https://cached-assets.howdygo.com/9CaG308voNtewYiojBH-MVsdeNxvJ_QHvKWJ2rAr3oo\") format(\"woff\"), url(\"https://cached-assets.howdygo.com/evz6RsLr0mp-dJ9EC8awnTEiFVKT8FFWXjxsqLhNoSc\") format(\"truetype\"), local(\"SAP-icons\"); font-weight: normal; font-style: normal; }`;
+      expect(adaptCssForReplay(cssText, cache)).toMatchCss(
+        `.sapThemeMetaData-UR-ls { background-image: url(\"https://cached-assets.howdygo.com/NWSRNMKs2gbuMpcwprO55nP9gp7Vfg3eqdiVRkwXXN8\"); }:root { --sapThemeMetaData-UR-ls: {\"Path\": \"UR.ls.sap_fiori_3.standards\", \"PathPattern\": \"/%frameworkId%/%libId%/%themeId%/%fileId%.css\", \"Extends\": [\"sap_base_fiori\",\"baseTheme\"], \"Tags\": [\"Fiori_3\",\"Touch\"], \"Scopes\": [\"lsCondensed\",\"lsScope--fioripaddings\"], \"Engine\": {\"Name\": \"theming-engine\", \"Version\": \"1.73.0\"}, \"Version\": { \"Build\": \"10.30.7.350828.20230224122352\", \"Source\": \"10.30.7.350828.1\", \"Required\": \"10.30.7.307232\"}}; } @font-face { font-family: SAP-icons; src: url(\"https://cached-assets.howdygo.com/FiD_UCYglUKNaic1GWjVsdo1vH1SoepXUAu-4DZCMYo\") format(\"woff2\"), url(\"https://cached-assets.howdygo.com/9CaG308voNtewYiojBH-MVsdeNxvJ_QHvKWJ2rAr3oo\") format(\"woff\"), url(\"https://cached-assets.howdygo.com/evz6RsLr0mp-dJ9EC8awnTEiFVKT8FFWXjxsqLhNoSc\") format(\"truetype\"), local(\"SAP-icons\"); font-weight: normal; font-style: normal; }`,
       );
     });
 
@@ -202,5 +264,24 @@ ul li.specified c:hover img, ul li.specified c.\\:hover img {
 
       expect(getDuration(cachedEnd) * factor).toBeLessThan(getDuration(end));
     });
+  });
+
+  it('should not incorrectly interpret escaped quotes', () => {
+    // the ':hover' in the below is a decoy which is not part of the selector,
+    // previously that part was being incorrectly consumed by the selector regex
+    const should_not_modify =
+      ".tailwind :is(.before\\:content-\\[\\'\\'\\])::before { --tw-content: \":hover\"; content: var(--tw-content); }.tailwind :is(.\\[\\&\\>li\\]\\:before\\:content-\\[\\'-\\'\\] > li)::before { color: pink; }";
+    expect(adaptCssForReplay(should_not_modify, cache)).toMatchCss(
+      should_not_modify,
+    );
+  });
+
+  it('should not incorrectly interpret at rules', () => {
+    // the ':hover' in the below is a decoy which is not part of the selector,
+    const should_not_modify =
+      '@import url("https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,400;0,500;0,700;1,400&display=:hover");';
+    expect(adaptCssForReplay(should_not_modify, cache)).toMatchCss(
+      should_not_modify,
+    );
   });
 });

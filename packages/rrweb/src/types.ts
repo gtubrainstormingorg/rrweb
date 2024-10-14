@@ -5,12 +5,11 @@ import type {
   MaskInputFn,
   MaskTextFn,
   DataURLOptions,
-} from 'rrweb-snapshot';
-import type { PackFn, UnpackFn } from './packer/base';
+} from 'howdygo-rrweb-snapshot';
 import type { IframeManager } from './record/iframe-manager';
 import type { ShadowDomManager } from './record/shadow-dom-manager';
 import type { Replayer } from './replay';
-import type { RRNode } from 'rrdom';
+import type { RRNode } from 'howdygo-rrdom';
 import type { CanvasManager } from './record/observers/canvas/canvas-manager';
 import type { StylesheetManager } from './record/stylesheet-manager';
 import type {
@@ -37,7 +36,9 @@ import type {
   styleDeclarationCallback,
   styleSheetRuleCallback,
   viewportResizeCallback,
-} from '@rrweb/types';
+  PackFn,
+  UnpackFn,
+} from 'howdygo-rrweb-types';
 import type ProcessedNodeManager from './record/processed-node-manager';
 
 export type recordOptions<T> = {
@@ -164,6 +165,7 @@ export type ReplayPlugin = {
   ) => void;
   getMirror?: (mirrors: { nodeMirror: Mirror }) => void;
 };
+export type { Replayer } from './replay';
 export type playerConfig = {
   speed: number;
   maxSpeed: number;
@@ -193,6 +195,7 @@ export type playerConfig = {
     log: (...args: Parameters<typeof console.log>) => void;
     warn: (...args: Parameters<typeof console.warn>) => void;
   };
+  disableScroll: boolean;
   plugins?: ReplayPlugin[];
 };
 
@@ -207,11 +210,12 @@ export type missingNodeMap = {
 declare global {
   interface Window {
     FontFace: typeof FontFace;
+    Array: typeof Array;
   }
 }
 
 export type CrossOriginIframeMessageEventContent<T = eventWithTime> = {
-  type: 'rrweb';
+  type: 'howdygo-rrweb';
   event: T;
   // The origin of the iframe which originally emits this message. It is used to check the integrity of message and to filter out the rrweb messages which are forwarded by some sites.
   origin: string;

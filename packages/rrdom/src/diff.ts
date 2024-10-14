@@ -1,8 +1,8 @@
 import {
   NodeType as RRNodeType,
   Mirror as NodeMirror,
-  elementNode,
-} from 'rrweb-snapshot';
+} from 'howdygo-rrweb-snapshot';
+import type { elementNode } from 'howdygo-rrweb-snapshot';
 import type {
   canvasMutationData,
   canvasEventWithTime,
@@ -10,7 +10,7 @@ import type {
   scrollData,
   styleDeclarationData,
   styleSheetRuleData,
-} from '@rrweb/types';
+} from 'howdygo-rrweb-types';
 import type {
   IRRCDATASection,
   IRRComment,
@@ -21,6 +21,7 @@ import type {
 } from './document';
 import type {
   RRCanvasElement,
+  RRDialogElement,
   RRElement,
   RRIFrameElement,
   RRMediaElement,
@@ -83,16 +84,20 @@ export type ReplayerHandler = {
     target: HTMLCanvasElement,
   ) => void;
   applyInput: (data: inputData) => void;
-  applyScroll: (data: scrollData, isSync: boolean) => void;
+  applyScroll: (
+    data: scrollData,
+    isSync: boolean,
+    forceScroll: boolean | undefined,
+  ) => void;
   applyStyleSheetMutation: (
     data: styleDeclarationData | styleSheetRuleData,
     styleSheet: CSSStyleSheet,
   ) => void;
-  // Similar to the `afterAppend` callback in the `rrweb-snapshot` package. It's a postorder traversal of the newly appended nodes.
+  // Similar to the `afterAppend` callback in the `howdygo-rrweb-snapshot` package. It's a postorder traversal of the newly appended nodes.
   afterAppend?(node: Node, id: number): void;
 };
 
-// A set contains newly appended nodes. It's used to make sure the afterAppend callback can iterate newly appended nodes in the same traversal order as that in the `rrweb-snapshot` package.
+// A set contains newly appended nodes. It's used to make sure the afterAppend callback can iterate newly appended nodes in the same traversal order as that in the `howdygo-rrweb-snapshot` package.
 let createdNodeSet: WeakSet<Node> | null = null;
 
 /**
@@ -220,14 +225,14 @@ function diffAfterUpdatingChildren(
   switch (newTree.RRNodeType) {
     case RRNodeType.Document: {
       const scrollData = (newTree as RRDocument).scrollData;
-      scrollData && replayer.applyScroll(scrollData, true);
+      scrollData && replayer.applyScroll(scrollData, true, true);
       break;
     }
     case RRNodeType.Element: {
       const oldElement = oldTree as HTMLElement;
       const newRRElement = newTree as RRElement;
       newRRElement.scrollData &&
-        replayer.applyScroll(newRRElement.scrollData, true);
+        replayer.applyScroll(newRRElement.scrollData, true, true);
       /**
        * Input data need to get applied after all children of this node are updated.
        * Otherwise when we set a value for a select element whose options are empty, the value won't actually update.
@@ -237,7 +242,7 @@ function diffAfterUpdatingChildren(
         case 'AUDIO':
         case 'VIDEO': {
           const oldMediaElement = oldTree as HTMLMediaElement;
-          const newMediaRRElement = newRRElement as RRMediaElement;
+          const newMediaRRElement = newRRElement as unknown as RRMediaElement;
           if (newMediaRRElement.paused !== undefined)
             newMediaRRElement.paused
               ? void oldMediaElement.pause()
@@ -285,6 +290,29 @@ function diffAfterUpdatingChildren(
             );
           break;
         }
+        case 'DIALOG': {
+          const dialog = oldElement as HTMLDialogElement;
+          const rrDialog = newRRElement as unknown as RRDialogElement;
+          const wasOpen = dialog.open;
+          const wasModal = dialog.matches('dialog:modal');
+          const shouldBeOpen = rrDialog.open;
+          const shouldBeModal = rrDialog.isModal;
+
+          const modalChanged = wasModal !== shouldBeModal;
+          const openChanged = wasOpen !== shouldBeOpen;
+
+          if (modalChanged || (wasOpen && openChanged)) dialog.close();
+          if (shouldBeOpen && (openChanged || modalChanged)) {
+            try {
+              if (shouldBeModal) dialog.showModal();
+              else dialog.show();
+            } catch (e) {
+              console.warn(e);
+            }
+          }
+
+          break;
+        }
       }
       break;
     }
@@ -330,12 +358,20 @@ function diffProps(
         }
       };
     } else if (newTree.tagName === 'IFRAME' && name === 'srcdoc') continue;
-    else oldTree.setAttribute(name, newValue);
+    else {
+      try {
+        oldTree.setAttribute(name, newValue);
+      } catch (err) {
+        // We want to continue diffing so we quietly catch
+        // this exception. Otherwise, this can throw and bubble up to
+        // the `ReplayerEvents.Flush` listener and break rendering
+        console.warn(err);
+      }
+    }
   }
 
   for (const { name } of Array.from(oldAttributes))
     if (!(name in newAttributes)) oldTree.removeAttribute(name);
-
   newTree.scrollLeft && (oldTree.scrollLeft = newTree.scrollLeft);
   newTree.scrollTop && (oldTree.scrollTop = newTree.scrollTop);
 }

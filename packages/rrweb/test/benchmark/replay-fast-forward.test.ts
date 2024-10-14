@@ -1,7 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as https from 'https';
-import type { eventWithTime } from '@rrweb/types';
+import { vi } from 'vitest';
+import type { eventWithTime } from 'howdygo-rrweb-types';
 import type { recordOptions } from '../../src/types';
 import { launchPuppeteer, ISuite } from '../utils';
 
@@ -71,7 +72,7 @@ const suites: Array<{
   {
     title: 'real events recorded on bugs.chromium.org',
     eventURL:
-      'https://raw.githubusercontent.com/rrweb-io/benchmark-events/main/rrdom-benchmark-1.json',
+      'https://raw.githubusercontent.com/rrweb-io/benchmark-events/main/howdygo-rrdom-benchmark-1.json',
     times: 3,
   },
 ];
@@ -81,18 +82,21 @@ function avg(v: number[]): number {
 }
 
 describe('benchmark: replayer fast-forward performance', () => {
-  jest.setTimeout(240000);
+  vi.setConfig({ testTimeout: 240000 });
   let code: ISuite['code'];
   let page: ISuite['page'];
   let browser: ISuite['browser'];
 
   beforeAll(async () => {
     browser = await launchPuppeteer({
-      headless: true,
+      headless: 'new',
       args: ['--disable-dev-shm-usage'],
     });
 
-    const bundlePath = path.resolve(__dirname, '../../dist/rrweb.min.js');
+    const bundlePath = path.resolve(
+      __dirname,
+      '../../dist/howdygo-rrweb.umd.cjs',
+    );
     code = fs.readFileSync(bundlePath, 'utf8');
   }, 600_000);
 
@@ -124,14 +128,14 @@ describe('benchmark: replayer fast-forward performance', () => {
               window.events = ${suite.eventsString};
             </script>
           </html>`);
-          const duration = (await page.evaluate(() => {
+          const duration = await page.evaluate(() => {
             const replayer = new (window as any).rrweb.Replayer(
               (window as any).events,
             );
             const start = Date.now();
             replayer.play(replayer.getMetaData().totalTime + 100);
             return Date.now() - start;
-          })) as number;
+          });
           durations.push(duration);
           await page.close();
         }

@@ -1,8 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import type * as puppeteer from 'puppeteer';
+import { vi } from 'vitest';
 import type { recordOptions } from '../../src/types';
-import { listenerHandler, eventWithTime, EventType } from '@rrweb/types';
+import { listenerHandler, eventWithTime, EventType } from 'howdygo-rrweb-types';
 import { launchPuppeteer } from '../utils';
 import {
   callbackWrapper,
@@ -37,7 +38,10 @@ const setup = function (
   beforeAll(async () => {
     ctx.browser = await launchPuppeteer();
 
-    const bundlePath = path.resolve(__dirname, '../../dist/rrweb.js');
+    const bundlePath = path.resolve(
+      __dirname,
+      '../../dist/howdygo-rrweb.umd.cjs',
+    );
     ctx.code = fs.readFileSync(bundlePath, 'utf8');
   });
 
@@ -69,7 +73,7 @@ const setup = function (
 };
 
 describe('error-handler', function (this: ISuite) {
-  jest.setTimeout(100_000);
+  vi.setConfig({ testTimeout: 100_000 });
 
   const ctx: ISuite = setup.call(
     this,

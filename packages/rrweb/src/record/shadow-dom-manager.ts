@@ -3,15 +3,16 @@ import type {
   mutationCallBack,
   scrollCallback,
   SamplingStrategy,
-} from '@rrweb/types';
+} from 'howdygo-rrweb-types';
 import {
   initMutationObserver,
   initScrollObserver,
   initAdoptedStyleSheetObserver,
 } from './observer';
 import { patch, inDom } from '../utils';
-import type { Mirror } from 'rrweb-snapshot';
-import { isNativeShadowDom } from 'rrweb-snapshot';
+import type { Mirror } from 'howdygo-rrweb-snapshot';
+import { isNativeShadowDom } from 'howdygo-rrweb-snapshot';
+import dom from 'howdygo-rrweb-utils';
 
 type BypassOptions = Omit<
   MutationBufferParam,
@@ -52,6 +53,7 @@ export class ShadowDomManager {
     if (!isNativeShadowDom(shadowRoot)) return;
     if (this.shadowDoms.has(shadowRoot)) return;
     this.shadowDoms.add(shadowRoot);
+    this.bypassOptions.canvasManager.addShadowRoot(shadowRoot);
     const observer = initMutationObserver(
       {
         ...this.bypassOptions,
@@ -81,7 +83,7 @@ export class ShadowDomManager {
       )
         this.bypassOptions.stylesheetManager.adoptStyleSheets(
           shadowRoot.adoptedStyleSheets,
-          this.mirror.getId(shadowRoot.host),
+          this.mirror.getId(dom.host(shadowRoot)),
         );
       this.restoreHandlers.push(
         initAdoptedStyleSheetObserver(
@@ -128,13 +130,14 @@ export class ShadowDomManager {
         'attachShadow',
         function (original: (init: ShadowRootInit) => ShadowRoot) {
           return function (this: Element, option: ShadowRootInit) {
-            const shadowRoot = original.call(this, option);
+            const sRoot = original.call(this, option);
             // For the shadow dom elements in the document, monitor their dom mutations.
             // For shadow dom elements that aren't in the document yet,
             // we start monitoring them once their shadow dom host is appended to the document.
-            if (this.shadowRoot && inDom(this))
-              manager.addShadowRoot(this.shadowRoot, doc);
-            return shadowRoot;
+            const shadowRootEl = dom.shadowRoot(this);
+            if (shadowRootEl && inDom(this))
+              manager.addShadowRoot(shadowRootEl, doc);
+            return sRoot;
           };
         },
       ),
@@ -151,5 +154,6 @@ export class ShadowDomManager {
     });
     this.restoreHandlers = [];
     this.shadowDoms = new WeakSet();
+    this.bypassOptions.canvasManager.resetShadowRoots();
   }
 }
