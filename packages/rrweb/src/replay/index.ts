@@ -2047,6 +2047,7 @@ export class Replayer {
         styleSheet.rules,
         data.index,
       ) as unknown as CSSStyleRule;
+      if (!rule) return;
       rule.style.setProperty(
         data.set.property,
         data.set.value,
@@ -2059,6 +2060,7 @@ export class Replayer {
         styleSheet.rules,
         data.index,
       ) as unknown as CSSStyleRule;
+      if (!rule) return;
       rule.style.removeProperty(data.remove.property);
     }
   }
