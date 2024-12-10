@@ -3,7 +3,7 @@ import type {
   Mirror,
   INode,
   DataURLOptions,
-} from 'rrweb-snapshot';
+} from 'howdygo-rrweb-snapshot';
 
 export enum EventType {
   DomContentLoaded,
@@ -425,6 +425,8 @@ type mouseInteractionParam = {
   id: number;
   x?: number;
   y?: number;
+  xOffset?: number;
+  yOffset?: number;
   pointerType?: PointerTypes;
 };
 
@@ -565,7 +567,7 @@ export type inputValue = {
 
 export type inputCallback = (v: inputValue & { id: number }) => void;
 
-export const enum MediaInteractions {
+export enum MediaInteractions {
   Play,
   Pause,
   Seeked,
@@ -704,3 +706,7 @@ export type TakeTypedKeyValues<Obj extends object, Type> = Pick<
   Obj,
   TakeTypeHelper<Obj, Type>[keyof TakeTypeHelper<Obj, Type>]
 >;
+
+// Types for howdygo-rrweb-packer
+export type PackFn = (event: eventWithTime) => string;
+export type UnpackFn = (raw: string) => eventWithTime;

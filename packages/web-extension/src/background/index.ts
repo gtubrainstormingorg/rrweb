@@ -1,12 +1,12 @@
 import Browser from 'webextension-polyfill';
-import type { eventWithTime } from '@rrweb/types';
+import type { eventWithTime } from 'howdygo-rrweb-types';
 import Channel from '~/utils/channel';
 import {
-  LocalData,
+  type LocalData,
   LocalDataKey,
   RecorderStatus,
-  Settings,
-  SyncData,
+  type Settings,
+  type SyncData,
   SyncDataKey,
 } from '~/types';
 import { pauseRecording, resumeRecording } from '~/utils/recording';

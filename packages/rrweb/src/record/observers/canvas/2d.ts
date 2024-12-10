@@ -1,11 +1,10 @@
-import type { Mirror } from 'rrweb-snapshot';
 import {
-  blockClass,
+  type blockClass,
   CanvasContext,
-  canvasManagerMutationCallback,
-  IWindow,
-  listenerHandler,
-} from '@rrweb/types';
+  type canvasManagerMutationCallback,
+  type IWindow,
+  type listenerHandler,
+} from 'howdygo-rrweb-types';
 import { hookSetter, isBlocked, patch } from '../../../utils';
 import { serializeArgs } from './serialize-args';
 

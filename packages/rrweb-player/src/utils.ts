@@ -15,8 +15,8 @@ declare global {
   }
 }
 
-import { EventType, IncrementalSource } from 'rrweb';
-import type { eventWithTime } from '@rrweb/types';
+import { EventType, IncrementalSource } from 'howdygo-rrweb-types';
+import type { eventWithTime } from 'howdygo-rrweb-types';
 
 export function inlineCss(cssObj: Record<string, string>): string {
   let style = '';
@@ -68,6 +68,7 @@ export function openFullscreen(el: HTMLElement): Promise<void> {
     /* IE/Edge */
     return el.msRequestFullscreen();
   }
+  return Promise.resolve();
 }
 
 export function exitFullscreen(): Promise<void> {
@@ -83,16 +84,19 @@ export function exitFullscreen(): Promise<void> {
     /* IE/Edge */
     return document.msExitFullscreen();
   }
+  return Promise.resolve();
 }
 
 export function isFullscreen(): boolean {
   let fullscreen = false;
-  [
-    'fullscreen',
-    'webkitIsFullScreen',
-    'mozFullScreen',
-    'msFullscreenElement',
-  ].forEach((fullScreenAccessor) => {
+  (
+    [
+      'fullscreen',
+      'webkitIsFullScreen',
+      'mozFullScreen',
+      'msFullscreenElement',
+    ] as const
+  ).forEach((fullScreenAccessor) => {
     if (fullScreenAccessor in document) {
       fullscreen = fullscreen || Boolean(document[fullScreenAccessor]);
     }
@@ -140,13 +144,13 @@ export function typeOf(
     '[object Undefined]': 'undefined',
     '[object Null]': 'null',
     '[object Object]': 'object',
-  };
+  } as const;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-  return map[toString.call(obj)];
+  return map[toString.call(obj) as keyof typeof map];
 }
 
 /**
- * Forked from 'rrweb' replay/index.ts. The original function is not exported.
+ * Forked from 'howdygo-rrweb' replay/index.ts. The original function is not exported.
  * Determine whether the event is a user interaction event
  * @param event - event to be determined
  * @returns true if the event is a user interaction event

@@ -1,5 +1,5 @@
-import type { ICanvas } from 'rrweb-snapshot';
-import type { blockClass, IWindow, listenerHandler } from '@rrweb/types';
+import type { ICanvas } from 'howdygo-rrweb-snapshot';
+import type { blockClass, IWindow, listenerHandler } from 'howdygo-rrweb-types';
 import { isBlocked, patch } from '../../../utils';
 
 function getNormalizedContextName(contextType: string) {

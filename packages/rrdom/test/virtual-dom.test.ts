@@ -4,8 +4,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as puppeteer from 'puppeteer';
+import { vi } from 'vitest';
 import { JSDOM } from 'jsdom';
 import {
+  buildNodeWithSN,
   cdataNode,
   commentNode,
   documentNode,
@@ -15,7 +17,7 @@ import {
   NodeType,
   NodeType as RRNodeType,
   textNode,
-} from 'rrweb-snapshot';
+} from 'howdygo-rrweb-snapshot';
 import {
   buildFromDom,
   buildFromNode,
@@ -26,7 +28,6 @@ import {
   RRElement,
   BaseRRNode as RRNode,
 } from '../src';
-import { compileTSCode } from './utils';
 
 const printRRDomCode = `
 /**
@@ -50,7 +51,7 @@ function walk(node, mirror, blankSpace) {
 `;
 
 describe('RRDocument for browser environment', () => {
-  jest.setTimeout(60_000);
+  vi.setConfig({ testTimeout: 60_000 });
   let mirror: Mirror;
   beforeEach(() => {
     mirror = new Mirror();
@@ -207,6 +208,33 @@ describe('RRDocument for browser environment', () => {
       expect((rrNode as RRElement).tagName).toEqual('SHADOWROOT');
       expect(rrNode).toBe(parentRRNode.shadowRoot);
     });
+
+    it('can rebuild blocked element with correct dimensions', () => {
+      // @ts-expect-error Testing buildNodeWithSN with rr elements
+      const node = buildNodeWithSN(
+        {
+          id: 1,
+          tagName: 'svg',
+          type: NodeType.Element,
+          isSVG: true,
+          attributes: {
+            rr_width: '50px',
+            rr_height: '50px',
+          },
+          childNodes: [],
+        },
+        {
+          // @ts-expect-error
+          doc: new RRDocument(),
+          mirror,
+          blockSelector: '*',
+          slimDOMOptions: {},
+        },
+      ) as RRElement;
+
+      expect(node.style.width).toBe('50px');
+      expect(node.style.height).toBe('50px');
+    });
   });
 
   describe('create a RRDocument from a html document', () => {
@@ -216,7 +244,10 @@ describe('RRDocument for browser environment', () => {
 
     beforeAll(async () => {
       browser = await puppeteer.launch();
-      code = await compileTSCode(path.resolve(__dirname, '../src/index.ts'));
+      code = fs.readFileSync(
+        path.resolve(__dirname, '../dist/howdygo-rrdom.umd.cjs'),
+        'utf8',
+      );
     });
     afterAll(async () => {
       await browser.close();

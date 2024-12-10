@@ -1,4 +1,4 @@
-import { NodeType } from 'rrweb-snapshot';
+import { NodeType } from 'howdygo-rrweb-snapshot';
 import {
   EventType,
   IncrementalSource,
@@ -8,7 +8,7 @@ import {
   Optional,
   mouseInteractionData,
   pluginEvent,
-} from '@rrweb/types';
+} from 'howdygo-rrweb-types';
 import type { recordOptions } from '../src/types';
 import * as puppeteer from 'puppeteer';
 import { format } from 'prettier';
@@ -26,7 +26,7 @@ export async function launchPuppeteer(
       width: 1920,
       height: 1080,
     },
-    args: ['--no-sandbox'],
+    args: ['--no-sandbox', '--window-size=1920,1080'],
     ...options,
   });
 }
@@ -44,7 +44,7 @@ export interface ISuite {
   events: eventWithTime[];
 }
 
-export const startServer = (defaultPort: number = 3030) =>
+export const startServer = (defaultPort = 3030) =>
   new Promise<http.Server>((resolve) => {
     const mimeType: IMimeType = {
       '.html': 'text/html',
@@ -59,8 +59,8 @@ export const startServer = (defaultPort: number = 3030) =>
         .replace(/^(\.\.[\/\\])+/, '');
 
       let pathname = path.join(__dirname, sanitizePath);
-      if (/^\/rrweb.*\.js.*/.test(sanitizePath)) {
-        pathname = path.join(__dirname, `../dist`, sanitizePath);
+      if (/^\/rrweb.*\.c?js.*/.test(sanitizePath)) {
+        pathname = path.join(__dirname, `../dist/main`, sanitizePath);
       }
 
       try {
@@ -105,14 +105,22 @@ export function getServerURL(server: http.Server): string {
  * Also remove timestamp from event.
  * @param snapshots incrementalSnapshotEvent[]
  */
-function stringifySnapshots(snapshots: eventWithTime[]): string {
+export function stringifySnapshots(snapshots: eventWithTime[]): string {
   return JSON.stringify(
     snapshots
       .filter((s) => {
         if (
-          s.type === EventType.IncrementalSnapshot &&
-          (s.data.source === IncrementalSource.MouseMove ||
-            s.data.source === IncrementalSource.ViewportResize)
+          // mouse move or viewport resize can happen on accidental user interference
+          // so we ignore them
+          (s.type === EventType.IncrementalSnapshot &&
+            (s.data.source === IncrementalSource.MouseMove ||
+              s.data.source === IncrementalSource.ViewportResize)) ||
+          // ignore '[vite] connected' messages from vite
+          (s.type === EventType.Plugin &&
+            s.data.plugin === 'rrweb/console@1' &&
+            (s.data.payload as { payload: string[] })?.payload?.find((msg) =>
+              msg.includes('[vite] connected'),
+            ))
         ) {
           return false;
         }
@@ -242,18 +250,18 @@ function stringifySnapshots(snapshots: eventWithTime[]): string {
 
 function stripBlobURLsFromAttributes(node: {
   attributes: {
-    src?: string;
+    [key: string]: any;
   };
 }) {
-  if (
-    'src' in node.attributes &&
-    node.attributes.src &&
-    typeof node.attributes.src === 'string' &&
-    node.attributes.src.startsWith('blob:')
-  ) {
-    node.attributes.src = node.attributes.src
-      .replace(/[\w-]+$/, '...')
-      .replace(/:[0-9]+\//, ':xxxx/');
+  for (const attr in node.attributes) {
+    if (
+      typeof node.attributes[attr] === 'string' &&
+      node.attributes[attr].startsWith('blob:')
+    ) {
+      node.attributes[attr] = node.attributes[attr]
+        .replace(/[\w-]+$/, '...')
+        .replace(/:[0-9]+\//, ':xxxx/');
+    }
   }
 }
 
@@ -338,7 +346,10 @@ export function stripBase64(events: eventWithTime[]) {
     const newObj: Partial<T> = {};
     for (const prop in obj) {
       const value = obj[prop];
-      if (prop === 'base64' && typeof value === 'string') {
+      if (
+        (prop === 'base64' || prop === 'rr_dataURL') &&
+        typeof value === 'string'
+      ) {
         let index = base64Strings.indexOf(value);
         if (index === -1) {
           index = base64Strings.push(value) - 1;
@@ -353,11 +364,11 @@ export function stripBase64(events: eventWithTime[]) {
 
   return events.map((evt) => {
     if (
-      evt.type === EventType.IncrementalSnapshot &&
-      evt.data.source === IncrementalSource.CanvasMutation
+      evt.type === EventType.FullSnapshot ||
+      evt.type === EventType.IncrementalSnapshot
     ) {
       const newData = walk(evt.data);
-      return { ...evt, data: newData };
+      return { ...evt, data: newData } as eventWithTime;
     }
     return evt;
   });
@@ -701,7 +712,8 @@ export function generateRecordSnippet(options: recordOptions<eventWithTime>) {
     recordCanvas: ${options.recordCanvas},
     recordAfter: '${options.recordAfter || 'load'}',
     inlineImages: ${options.inlineImages},
-    plugins: ${options.plugins}
+    plugins: ${options.plugins},
+    sampling: ${JSON.stringify(options.sampling)},
   });
   `;
 }
