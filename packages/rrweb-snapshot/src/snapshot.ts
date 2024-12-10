@@ -730,6 +730,50 @@ function serializeElementNode(
     if (image.complete && image.naturalWidth !== 0) recordInlineImage();
     else image.addEventListener('load', recordInlineImage);
   }
+  if (tagName === 'video' && inlineImages) {
+    const video = n as HTMLVideoElement;
+    const videoSrc: string = video.currentSrc || video.getAttribute('src') || '<unknown-src>';
+    const priorCrossOrigin = video.crossOrigin;
+  
+    const recordInlineVideo = () => {
+      video.removeEventListener('loadeddata', recordInlineVideo);
+      try {
+        // Check if the video source is a blob URL
+        if (videoSrc.startsWith("blob:")) {
+          // Fetch the video blob
+          fetch(videoSrc)
+            .then(response => response.blob())
+            .then(blob => {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                // Convert the video blob to a Base64 data URL
+                attributes.rr_dataURL = reader.result as string;
+              };
+              reader.readAsDataURL(blob); // Converts the video to Base64
+            })
+            .catch(err => {
+              console.warn(`Cannot inline video src=${videoSrc}! Error: ${err}`);
+            });
+        }
+      } catch (err) {
+        console.warn(`Error processing video: ${err}`);
+      }
+      // Handle cross-origin handling
+      if (video.crossOrigin === 'anonymous') {
+        priorCrossOrigin
+          ? (attributes.crossOrigin = priorCrossOrigin)
+          : video.removeAttribute('crossorigin');
+      }
+    };
+  
+    if (video.readyState >= 2) {
+      // "HAVE_CURRENT_DATA", the video is ready
+      recordInlineVideo();
+    } else {
+      // Wait until the video data is fully loaded
+      video.addEventListener('loadeddata', recordInlineVideo);
+    }
+  }
   // media elements
   if (tagName === 'audio' || tagName === 'video') {
     const mediaAttributes = attributes as mediaAttributes;
