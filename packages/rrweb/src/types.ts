@@ -197,6 +197,7 @@ export type playerConfig = {
   };
   disableScroll: boolean;
   plugins?: ReplayPlugin[];
+  lazyLoadImages?: boolean;
 };
 
 export type missingNode = {

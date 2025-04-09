@@ -134,6 +134,7 @@ export function buildStyleNode(
     doc: Document;
     hackCss: boolean;
     cache: BuildCache;
+    lazyLoadImages?: boolean;
   },
 ) {
   const { doc, hackCss, cache } = options;
@@ -157,9 +158,10 @@ function buildNode(
     doc: Document;
     hackCss: boolean;
     cache: BuildCache;
+    lazyLoadImages?: boolean;
   },
 ): Node | null {
-  const { doc, hackCss, cache } = options;
+  const { doc, hackCss, cache, lazyLoadImages } = options;
   switch (n.type) {
     case NodeType.Document:
       return doc.implementation.createDocument(null, '', null);
@@ -195,6 +197,10 @@ function buildNode(
        * We need to parse them last so they can overwrite conflicting attributes.
        */
       const specialAttributes: { [key: string]: string | number } = {};
+      // Add lazy loading for images
+      if (tagName === 'img' && !n.attributes['loading'] && lazyLoadImages === true) {
+        node.setAttribute('loading', 'lazy');
+      }
       for (const name in n.attributes) {
         if (!Object.prototype.hasOwnProperty.call(n.attributes, name)) {
           continue;
@@ -410,6 +416,7 @@ export function buildNodeWithSN(
     mirror: Mirror;
     skipChild?: boolean;
     hackCss: boolean;
+    lazyLoadImages?: boolean;
     /**
      * This callback will be called for each of this nodes' `.childNodes` after they are appended to _this_ node.
      * Caveat: This callback _doesn't_ get called when this node is appended to the DOM.
@@ -423,6 +430,7 @@ export function buildNodeWithSN(
     mirror,
     skipChild = false,
     hackCss = true,
+    lazyLoadImages = false,
     afterAppend,
     cache,
   } = options;
@@ -439,7 +447,7 @@ export function buildNodeWithSN(
     // For safety concern, check if the node in mirror is the same as the node we are trying to build
     if (isNodeMetaEqual(meta, n)) return mirror.getNode(n.id);
   }
-  let node = buildNode(n, { doc, hackCss, cache });
+  let node = buildNode(n, { doc, hackCss, cache, lazyLoadImages });
   if (!node) {
     return null;
   }
@@ -489,6 +497,7 @@ export function buildNodeWithSN(
         mirror,
         skipChild: false,
         hackCss,
+        lazyLoadImages,
         afterAppend,
         cache,
       });
@@ -577,6 +586,7 @@ function rebuild(
     doc: Document;
     onVisit?: (node: Node) => unknown;
     hackCss?: boolean;
+    lazyLoadImages?: boolean;
     afterAppend?: (n: Node, id: number) => unknown;
     cache: BuildCache;
     mirror: Mirror;
@@ -586,6 +596,7 @@ function rebuild(
     doc,
     onVisit,
     hackCss = true,
+    lazyLoadImages = false,
     afterAppend,
     cache,
     mirror = new Mirror(),
@@ -595,6 +606,7 @@ function rebuild(
     mirror,
     skipChild: false,
     hackCss,
+    lazyLoadImages,
     afterAppend,
     cache,
   });

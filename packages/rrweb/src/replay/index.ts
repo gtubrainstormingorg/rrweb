@@ -203,6 +203,7 @@ export class Replayer {
       useVirtualDom: true, // Virtual-dom optimization is enabled by default.
       disableScroll: false, // Disable scroll mutations
       logger: console,
+      lazyLoadImages: false, // Enable lazy loading for images by default
     };
     this.config = Object.assign({}, defaultConfig, config);
 
@@ -845,6 +846,7 @@ export class Replayer {
       afterAppend,
       cache: this.cache,
       mirror: this.mirror,
+      lazyLoadImages: this.config.lazyLoadImages,
     });
     afterAppend(this.iframe.contentDocument, event.data.node.id);
 
@@ -956,6 +958,7 @@ export class Replayer {
       doc: iframeEl.contentDocument! as Document,
       mirror: mirror as Mirror,
       hackCss: true,
+      lazyLoadImages: this.config.lazyLoadImages,
       skipChild: false,
       afterAppend,
       cache: this.cache,
@@ -1563,6 +1566,7 @@ export class Replayer {
         mirror: mirror as Mirror, // can be this.mirror or virtualDom.mirror
         skipChild: true,
         hackCss: true,
+        lazyLoadImages: this.config.lazyLoadImages,
         cache: this.cache,
         /**
          * caveat: `afterAppend` only gets called on child nodes of target
@@ -1805,6 +1809,7 @@ export class Replayer {
                     mirror: mirror as Mirror,
                     skipChild: true,
                     hackCss: true,
+                    lazyLoadImages: this.config.lazyLoadImages,
                     cache: this.cache,
                   });
                   const siblingNode = target.nextSibling;
