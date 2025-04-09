@@ -198,7 +198,11 @@ function buildNode(
        */
       const specialAttributes: { [key: string]: string | number } = {};
       // Add lazy loading for images
-      if (tagName === 'img' && !n.attributes['loading'] && lazyLoadImages === true) {
+      if (
+        tagName === 'img' &&
+        !n.attributes['loading'] &&
+        lazyLoadImages === true
+      ) {
         node.setAttribute('loading', 'lazy');
       }
       for (const name in n.attributes) {
