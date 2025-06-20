@@ -193,7 +193,11 @@ function buildNode(
       }
 
       if (tagName === 'iframe' && !n.attributes.src) {
-        node.setAttribute('src', '/iframe/rrweb.html');
+        // Only set iframe src in Safari (both mobile and desktop) due to Safari-specific nested iframe handling requirements
+        const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome|Chromium|Edge/.test(navigator.userAgent);
+        if (isSafari) {
+          node.setAttribute('src', '/iframe/rrweb.html');
+        }
       }
       /**
        * Attribute names start with `rr_` are internal attributes added by rrweb.
