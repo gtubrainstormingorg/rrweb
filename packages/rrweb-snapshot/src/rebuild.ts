@@ -191,6 +191,10 @@ function buildNode(
           );
         node = doc.createElement(tagName);
       }
+
+      if (tagName === 'iframe' && !n.attributes.src) {
+        node.setAttribute('src', '/iframe/rrweb.html');
+      }
       /**
        * Attribute names start with `rr_` are internal attributes added by rrweb.
        * They often overwrite other attributes on the element.
