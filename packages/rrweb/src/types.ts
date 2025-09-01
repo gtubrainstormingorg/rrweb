@@ -178,6 +178,7 @@ export type playerConfig = {
   blockClass: string;
   liveMode: boolean;
   insertStyleRules: string[];
+  insertScripts: (string | Function)[];
   triggerFocus: boolean;
   UNSAFE_replayCanvas: boolean;
   pauseAnimation?: boolean;

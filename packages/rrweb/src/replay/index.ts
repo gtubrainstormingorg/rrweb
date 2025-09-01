@@ -196,6 +196,7 @@ export class Replayer {
       blockClass: 'rr-block',
       liveMode: false,
       insertStyleRules: [],
+      insertScripts: [],
       triggerFocus: true,
       UNSAFE_replayCanvas: false,
       pauseAnimation: true,
@@ -858,6 +859,7 @@ export class Replayer {
     }
     const { documentElement, head } = this.iframe.contentDocument;
     this.insertStyleRules(documentElement, head);
+    this.insertScripts(head);
     collectedDialogs.forEach((d) => applyDialogToTopLevel(d));
     if (!this.service.state.matches('playing')) {
       this.iframe.contentDocument
@@ -915,6 +917,43 @@ export class Replayer {
     }
   }
 
+  private insertScripts(
+    head: HTMLHeadElement | RRElement,
+  ) {
+    const injectScripts = this.config.insertScripts;
+    if (!injectScripts.length) {
+      return;
+    }
+    
+    for (let idx = 0; idx < injectScripts.length; idx++) {
+      const script = injectScripts[idx];
+      let scriptContent: string;
+      
+      // Handle both strings and functions
+      if (typeof script === 'function') {
+        // Convert function to string and wrap in IIFE for execution
+        scriptContent = `(${script.toString()})();`;
+      } else {
+        // Use string as-is
+        scriptContent = script;
+      }
+      
+      if (this.usingVirtualDom) {
+        const scriptEl = this.virtualDom.createElement('script');
+        this.virtualDom.mirror.add(
+          scriptEl,
+          getDefaultSN(scriptEl, this.virtualDom.unserializedId),
+        );
+        scriptEl.textContent = scriptContent;
+        (head as RRElement).appendChild(scriptEl);
+      } else {
+        const scriptEl = document.createElement('script');
+        scriptEl.textContent = scriptContent;
+        (head as HTMLHeadElement).appendChild(scriptEl);
+      }
+    }
+  }
+
   private attachDocumentToIframe(
     mutation: addedNodeMutation,
     iframeEl: HTMLIFrameElement | RRIFrameElement,
@@ -939,6 +978,9 @@ export class Replayer {
         const { documentElement, head } = iframeEl.contentDocument!;
         this.insertStyleRules(
           documentElement as HTMLElement | RRElement,
+          head as HTMLElement | RRElement,
+        );
+        this.insertScripts(
           head as HTMLElement | RRElement,
         );
       }
