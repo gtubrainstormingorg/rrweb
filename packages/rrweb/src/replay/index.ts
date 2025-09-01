@@ -917,18 +917,16 @@ export class Replayer {
     }
   }
 
-  private insertScripts(
-    head: HTMLHeadElement | RRElement,
-  ) {
+  private insertScripts(head: HTMLHeadElement | RRElement) {
     const injectScripts = this.config.insertScripts;
     if (!injectScripts.length) {
       return;
     }
-    
+
     for (let idx = 0; idx < injectScripts.length; idx++) {
       const script = injectScripts[idx];
       let scriptContent: string;
-      
+
       // Handle both strings and functions
       if (typeof script === 'function') {
         // Convert function to string and wrap in IIFE for execution
@@ -937,7 +935,7 @@ export class Replayer {
         // Use string as-is
         scriptContent = script;
       }
-      
+
       if (this.usingVirtualDom) {
         const scriptEl = this.virtualDom.createElement('script');
         this.virtualDom.mirror.add(
@@ -980,9 +978,7 @@ export class Replayer {
           documentElement as HTMLElement | RRElement,
           head as HTMLElement | RRElement,
         );
-        this.insertScripts(
-          head as HTMLElement | RRElement,
-        );
+        this.insertScripts(head as HTMLElement | RRElement);
       }
 
       // Skip the plugin onBuild callback in the virtual dom mode
