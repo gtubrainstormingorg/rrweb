@@ -8,15 +8,15 @@ import type {
   IWindow,
   DeprecatedMirror,
   textMutation,
-} from 'howdygo-rrweb-types';
-import type { IMirror, Mirror, SlimDOMOptions } from 'howdygo-rrweb-snapshot';
+} from '@howdygo/rrweb-types';
+import type { IMirror, Mirror, SlimDOMOptions } from '@howdygo/rrweb-snapshot';
 import {
   isShadowRoot,
   IGNORED_NODE,
   classMatchesRegex,
-} from 'howdygo-rrweb-snapshot';
-import { RRNode, RRIFrameElement, BaseRRNode } from 'howdygo-rrdom';
-import dom from 'howdygo-rrweb-utils';
+} from '@howdygo/rrweb-snapshot';
+import { RRNode, RRIFrameElement, BaseRRNode } from '@howdygo/rrdom';
+import dom from '@howdygo/rrweb-utils';
 
 export function on(
   type: string,
@@ -293,7 +293,7 @@ export function isIgnored(
     return true;
   }
   // The main part of the slimDOM check happens in
-  // howdygo-rrweb-snapshot::serializeNodeWithId
+  // @howdygo/rrweb-snapshot::serializeNodeWithId
   return mirror.getId(n) === IGNORED_NODE;
 }
 

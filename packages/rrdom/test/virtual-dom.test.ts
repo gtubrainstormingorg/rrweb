@@ -17,7 +17,7 @@ import {
   NodeType,
   NodeType as RRNodeType,
   textNode,
-} from 'howdygo-rrweb-snapshot';
+} from '@howdygo/rrweb-snapshot';
 import {
   buildFromDom,
   buildFromNode,
@@ -245,7 +245,7 @@ describe('RRDocument for browser environment', () => {
     beforeAll(async () => {
       browser = await puppeteer.launch();
       code = fs.readFileSync(
-        path.resolve(__dirname, '../dist/howdygo-rrdom.umd.cjs'),
+        path.resolve(__dirname, '../dist/@howdygo/rrdom.umd.cjs'),
         'utf8',
       );
     });

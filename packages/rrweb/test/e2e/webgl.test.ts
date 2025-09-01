@@ -13,7 +13,7 @@ import {
   fakeGoto,
 } from '../utils';
 import type { recordOptions } from '../../src/types';
-import type { eventWithTime } from 'howdygo-rrweb-types';
+import type { eventWithTime } from '@howdygo/rrweb-types';
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 expect.extend({ toMatchImageSnapshot });
 
@@ -31,7 +31,7 @@ describe('e2e webgl', () => {
 
     const bundlePath = path.resolve(
       __dirname,
-      '../../dist/howdygo-rrweb.umd.cjs',
+      '../../dist/@howdygo/rrweb.umd.cjs',
     );
     code = fs.readFileSync(bundlePath, 'utf8');
   });

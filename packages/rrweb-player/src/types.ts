@@ -1,6 +1,6 @@
-import type { eventWithTime } from 'howdygo-rrweb-types';
-import type { Replayer, playerConfig } from 'howdygo-rrweb-replay';
-import type { Mirror } from 'howdygo-rrweb-snapshot';
+import type { eventWithTime } from '@howdygo/rrweb-types';
+import type { Replayer, playerConfig } from '@howdygo/rrweb-replay';
+import type { Mirror } from '@howdygo/rrweb-snapshot';
 
 export type RRwebPlayerOptions = {
   target: HTMLElement;

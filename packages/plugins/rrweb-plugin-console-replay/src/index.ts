@@ -2,10 +2,10 @@ import {
   type LogLevel,
   type LogData,
   PLUGIN_NAME,
-} from 'howdygo-rrweb-plugin-console-record';
-import type { eventWithTime } from 'howdygo-rrweb-types';
-import { EventType, IncrementalSource } from 'howdygo-rrweb-types';
-import type { ReplayPlugin, Replayer } from 'howdygo-rrweb';
+} from '@howdygo/rrweb-plugin-console-record';
+import type { eventWithTime } from '@howdygo/rrweb-types';
+import { EventType, IncrementalSource } from '@howdygo/rrweb-types';
+import type { ReplayPlugin, Replayer } from '@howdygo/rrweb';
 
 /**
  * define an interface to replay log records

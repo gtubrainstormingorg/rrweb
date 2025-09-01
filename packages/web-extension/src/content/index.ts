@@ -1,6 +1,6 @@
 import Browser, { type Storage } from 'webextension-polyfill';
 import { nanoid } from 'nanoid';
-import type { eventWithTime } from 'howdygo-rrweb-types';
+import type { eventWithTime } from '@howdygo/rrweb-types';
 import {
   type LocalData,
   LocalDataKey,

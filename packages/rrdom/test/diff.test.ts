@@ -10,7 +10,7 @@ import {
   createMirror,
   Mirror as NodeMirror,
   serializedNodeWithId,
-} from 'howdygo-rrweb-snapshot';
+} from '@howdygo/rrweb-snapshot';
 import {
   buildFromDom,
   getDefaultSN,
@@ -30,8 +30,8 @@ import type { IRRElement, IRRNode } from '../src/document';
 import type {
   canvasMutationData,
   styleSheetRuleData,
-} from 'howdygo-rrweb-types';
-import { EventType, IncrementalSource } from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
+import { EventType, IncrementalSource } from '@howdygo/rrweb-types';
 
 const elementSn = {
   type: RRNodeType.Element,
@@ -1419,7 +1419,7 @@ describe('diff algorithm for rrdom', () => {
 
       try {
         const code = fs.readFileSync(
-          path.resolve(__dirname, '../dist/howdygo-rrdom.umd.cjs'),
+          path.resolve(__dirname, '../dist/@howdygo/rrdom.umd.cjs'),
           'utf8',
         );
         await page.evaluate(code);

@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { EventType } from 'howdygo-rrweb-types';
-  import type { playerMetaData } from 'howdygo-rrweb-types';
+  import { EventType } from '@howdygo/rrweb-types';
+  import type { playerMetaData } from '@howdygo/rrweb-types';
   import type {
     Replayer,
     PlayerMachineState,
     SpeedMachineState,
-  } from 'howdygo-rrweb-replay';
+  } from '@howdygo/rrweb-replay';
   import {
     onMount,
     onDestroy,

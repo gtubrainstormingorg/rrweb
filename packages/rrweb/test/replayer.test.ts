@@ -27,7 +27,7 @@ import adoptedStyleSheetModification from './events/adopted-style-sheet-modifica
 import documentReplacementEvents from './events/document-replacement';
 import hoverInIframeShadowDom from './events/iframe-shadowdom-hover';
 import customElementDefineClass from './events/custom-element-define-class';
-import { ReplayerEvents } from 'howdygo-rrweb-types';
+import { ReplayerEvents } from '@howdygo/rrweb-types';
 
 interface ISuite {
   code: string;
@@ -48,7 +48,7 @@ describe('replayer', function () {
   beforeAll(async () => {
     browser = await launchPuppeteer();
 
-    const bundlePath = path.resolve(__dirname, '../dist/howdygo-rrweb.umd.cjs');
+    const bundlePath = path.resolve(__dirname, '../dist/@howdygo/rrweb.umd.cjs');
     code = fs.readFileSync(bundlePath, 'utf8');
   });
 

@@ -1,22 +1,22 @@
 {
-  "name": "howdygo-rrdom",
+  "name": "@howdygo/rrdom",
   "version": "2.0.0-alpha.37",
   "homepage": "https://github.com/rrweb-io/rrweb/tree/main/packages/rrdom#readme",
   "license": "MIT",
   "type": "module",
-  "main": "./dist/howdygo-rrdom.cjs",
-  "module": "./dist/howdygo-rrdom.js",
-  "unpkg": "./dist/howdygo-rrdom.umd.cjs",
+  "main": "./dist/rrdom.cjs",
+  "module": "./dist/rrdom.js",
+  "unpkg": "./dist/rrdom.umd.cjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/howdygo-rrdom.js"
+        "default": "./dist/rrdom.js"
       },
       "require": {
         "types": "./dist/index.d.cts",
-        "default": "./dist/howdygo-rrdom.cjs"
+        "default": "./dist/rrdom.cjs"
       }
     }
   },
@@ -41,7 +41,7 @@
     "url": "https://github.com/rrweb-io/rrweb/issues"
   },
   "devDependencies": {
-    "howdygo-rrweb-types": "^2.0.0-alpha.37",
+    "@howdygo/rrweb-types": "^2.0.0-alpha.37",
     "@types/puppeteer": "^5.4.4",
     "@typescript-eslint/eslint-plugin": "^5.23.0",
     "@typescript-eslint/parser": "^5.23.0",
@@ -52,6 +52,6 @@
     "vite-plugin-dts": "^3.9.1"
   },
   "dependencies": {
-    "howdygo-rrweb-snapshot": "^2.0.0-alpha.37"
+    "@howdygo/rrweb-snapshot": "^2.0.0-alpha.37"
   }
 }

@@ -134,11 +134,11 @@ export default function (
 
       sourcemap: true,
 
-      // rollupOptions: {
-      //   output: {
-      //     manualChunks: {},
-      //   },
-      // },
+      rollupOptions: {
+        output: {
+          exports: "named",
+        },
+      },
     },
     plugins: [
       dts({

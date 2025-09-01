@@ -1,6 +1,6 @@
-import type { SequentialIdOptions } from 'howdygo-rrweb-plugin-sequential-id-record';
-import type { ReplayPlugin } from 'howdygo-rrweb';
-import type { eventWithTime } from 'howdygo-rrweb-types';
+import type { SequentialIdOptions } from '@howdygo/rrweb-plugin-sequential-id-record';
+import type { ReplayPlugin } from '@howdygo/rrweb';
+import type { eventWithTime } from '@howdygo/rrweb-types';
 
 type Options = SequentialIdOptions & {
   warnOnMissingId: boolean;

@@ -1,8 +1,8 @@
 {
-  "name": "howdygo-rrweb-player",
+  "name": "@howdygo/rrweb-player",
   "version": "2.0.0-alpha.37",
   "devDependencies": {
-    "howdygo-rrweb-types": "^2.0.0-alpha.37",
+    "@howdygo/rrweb-types": "^2.0.0-alpha.37",
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/package": "^2.0.0",
@@ -20,8 +20,8 @@
   },
   "dependencies": {
     "@tsconfig/svelte": "^1.0.0",
-    "howdygo-rrweb-replay": "^2.0.0-alpha.37",
-    "howdygo-rrweb-packer": "^2.0.0-alpha.37"
+    "@howdygo/rrweb-replay": "^2.0.0-alpha.37",
+    "@howdygo/rrweb-packer": "^2.0.0-alpha.37"
   },
   "scripts": {
     "dev": "vite build --watch",
@@ -33,19 +33,19 @@
     "lint": "yarn eslint src/**/*.ts"
   },
   "description": "rrweb's replayer UI",
-  "main": "./dist/howdygo-rrweb-player.umd.cjs",
-  "module": "./dist/howdygo-rrweb-player.js",
-  "unpkg": "./dist/howdygo-rrweb-player.umd.cjs",
-  "typings": "dist/howdygo-rrweb-player.d.ts",
+  "main": "./dist/rrweb-player.umd.cjs",
+  "module": "./dist/rrweb-player.js",
+  "unpkg": "./dist/rrweb-player.umd.cjs",
+  "typings": "dist/rrweb-player.d.ts",
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/howdygo-rrweb-player.d.ts",
-        "default": "./dist/howdygo-rrweb-player.js"
+        "types": "./dist/rrweb-player.d.ts",
+        "default": "./dist/rrweb-player.js"
       },
       "require": {
-        "types": "./dist/howdygo-rrweb-player.d.cts",
-        "default": "./dist/howdygo-rrweb-player.cjs"
+        "types": "./dist/rrweb-player.d.cts",
+        "default": "./dist/rrweb-player.cjs"
       }
     },
     "./dist/style.css": "./dist/style.css"
@@ -60,7 +60,7 @@
     "url": "git+https://github.com/rrweb-io/rrweb.git"
   },
   "keywords": [
-    "howdygo-rrweb"
+    "@howdygo/rrweb"
   ],
   "author": "yanzhen@smartx.com",
   "license": "MIT",

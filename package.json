@@ -6,7 +6,7 @@
     "url": "git+ssh://git@github.com/rrweb-io/rrweb.git"
   },
   "keywords": [
-    "howdygo-rrweb"
+    "@howdygo/rrweb"
   ],
   "author": "yanzhen@smartx.com",
   "license": "MIT",

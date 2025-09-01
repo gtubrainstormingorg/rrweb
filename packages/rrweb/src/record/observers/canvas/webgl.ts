@@ -5,7 +5,7 @@ import {
   type canvasMutationWithType,
   type IWindow,
   type listenerHandler,
-} from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
 import { hookSetter, isBlocked, patch } from '../../../utils';
 import { saveWebGLVar, serializeArgs } from './serialize-args';
 

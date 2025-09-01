@@ -1,5 +1,5 @@
-import type { eventWithTime } from 'howdygo-rrweb-types';
-import { record } from 'howdygo-rrweb';
+import type { eventWithTime } from '@howdygo/rrweb-types';
+import { record } from '@howdygo/rrweb';
 import { getRecordConsolePlugin } from '../../src/index';
 
 window.Date.now = () => new Date(Date.UTC(2018, 10, 15, 8)).valueOf();

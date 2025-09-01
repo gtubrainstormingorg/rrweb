@@ -7,8 +7,8 @@ import type {
   listenerHandler,
   eventWithTime,
   mutationData,
-} from 'howdygo-rrweb-types';
-import { EventType, IncrementalSource } from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
+import { EventType, IncrementalSource } from '@howdygo/rrweb-types';
 import {
   assertSnapshot,
   getServerURL,
@@ -48,7 +48,7 @@ async function injectRecordScript(
 ) {
   try {
     await frame.addScriptTag({
-      path: path.resolve(__dirname, '../../dist/howdygo-rrweb.umd.cjs'),
+      path: path.resolve(__dirname, '../../dist/@howdygo/rrweb.umd.cjs'),
     });
   } catch (e) {
     // we get this error: `Protocol error (DOM.resolveNode): Node with given id does not belong to the document`
@@ -100,7 +100,7 @@ const setup = function (
 
     const bundlePath = path.resolve(
       __dirname,
-      '../../dist/howdygo-rrweb.umd.cjs',
+      '../../dist/@howdygo/rrweb.umd.cjs',
     );
     ctx.code = fs.readFileSync(bundlePath, 'utf8');
   });

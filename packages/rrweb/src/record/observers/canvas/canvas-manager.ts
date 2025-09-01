@@ -1,5 +1,5 @@
 import { encode } from 'base64-arraybuffer';
-import type { Mirror, DataURLOptions } from 'howdygo-rrweb-snapshot';
+import type { Mirror, DataURLOptions } from '@howdygo/rrweb-snapshot';
 import type {
   blockClass,
   canvasManagerMutationCallback,
@@ -9,9 +9,9 @@ import type {
   IWindow,
   listenerHandler,
   CanvasArg,
-} from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
 import { isBlocked } from '../../../utils';
-import { CanvasContext } from 'howdygo-rrweb-types';
+import { CanvasContext } from '@howdygo/rrweb-types';
 import initCanvas2DMutationObserver from './2d';
 import initCanvasWebGLMutationObserver from './webgl';
 

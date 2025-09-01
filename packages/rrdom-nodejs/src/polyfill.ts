@@ -1,4 +1,4 @@
-import { BaseRRNode } from 'howdygo-rrdom';
+import { BaseRRNode } from '@howdygo/rrdom';
 import { RRDocument } from './document-nodejs';
 
 /**

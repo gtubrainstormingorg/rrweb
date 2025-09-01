@@ -1,5 +1,5 @@
 {
-  "name": "howdygo-rrweb",
+  "name": "@howdygo/rrweb",
   "version": "2.0.0-alpha.37",
   "description": "record and replay the web",
   "scripts": {
@@ -29,21 +29,21 @@
     "url": "git+ssh://git@github.com/rrweb-io/rrweb.git"
   },
   "keywords": [
-    "howdygo-rrweb"
+    "@howdygo/rrweb"
   ],
-  "main": "./dist/howdygo-rrweb.umd.cjs",
-  "module": "./dist/howdygo-rrweb.js",
-  "unpkg": "./dist/howdygo-rrweb.umd.cjs",
-  "typings": "dist/howdygo-rrweb.d.ts",
+  "main": "./dist/rrweb.umd.cjs",
+  "module": "./dist/rrweb.js",
+  "unpkg": "./dist/rrweb.umd.cjs",
+  "typings": "dist/rrweb.d.ts",
   "exports": {
     ".": {
       "import": {
         "types": "./dist/rrweb.d.ts",
-        "default": "./dist/howdygo-rrweb.js"
+        "default": "./dist/rrweb.js"
       },
       "require": {
         "types": "./dist/rrweb.d.cts",
-        "default": "./dist/howdygo-rrweb.cjs"
+        "default": "./dist/rrweb.cjs"
       }
     },
     "./dist/style.css": "./dist/style.css"
@@ -80,13 +80,13 @@
     "vite-plugin-dts": "^3.9.1"
   },
   "dependencies": {
-    "howdygo-rrweb-types": "^2.0.0-alpha.37",
-    "howdygo-rrweb-utils": "^2.0.0-alpha.37",
+    "@howdygo/rrweb-types": "^2.0.0-alpha.37",
+    "@howdygo/rrweb-utils": "^2.0.0-alpha.37",
     "@types/css-font-loading-module": "0.0.7",
     "@xstate/fsm": "^1.4.0",
     "base64-arraybuffer": "^1.0.1",
     "mitt": "^3.0.0",
-    "howdygo-rrdom": "^2.0.0-alpha.37",
-    "howdygo-rrweb-snapshot": "^2.0.0-alpha.37"
+    "@howdygo/rrdom": "^2.0.0-alpha.37",
+    "@howdygo/rrweb-snapshot": "^2.0.0-alpha.37"
   }
 }

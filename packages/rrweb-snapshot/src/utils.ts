@@ -11,7 +11,7 @@ import type {
   textNode,
   elementNode,
 } from './types';
-import dom from 'howdygo-rrweb-utils';
+import dom from '@howdygo/rrweb-utils';
 import { NodeType } from './types';
 
 export function isElement(n: Node): n is Element {

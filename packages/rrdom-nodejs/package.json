@@ -1,5 +1,5 @@
 {
-  "name": "howdygo-rrdom-nodejs",
+  "name": "@howdygo/rrdom-nodejs",
   "version": "2.0.0-alpha.37",
   "scripts": {
     "dev": "vite build --watch",
@@ -11,24 +11,24 @@
     "lint": "yarn eslint src/**/*.ts"
   },
   "keywords": [
-    "howdygo-rrweb",
-    "howdygo-rrdom-nodejs"
+    "@howdygo/rrweb",
+    "@howdygo/rrdom-nodejs"
   ],
   "license": "MIT",
   "type": "module",
-  "main": "./dist/howdygo-rrdom-nodejs.umd.cjs",
-  "module": "./dist/howdygo-rrdom-nodejs.js",
-  "unpkg": "./dist/howdygo-rrdom-nodejs.umd.cjs",
+  "main": "./dist/rrdom-nodejs.umd.cjs",
+  "module": "./dist/rrdom-nodejs.js",
+  "unpkg": "./dist/rrdom-nodejs.umd.cjs",
   "typings": "dist/index.d.ts",
   "exports": {
     ".": {
       "import": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/howdygo-rrdom-nodejs.js"
+        "default": "./dist/rrdom-nodejs.js"
       },
       "require": {
         "types": "./dist/index.d.cts",
-        "default": "./dist/howdygo-rrdom-nodejs.umd.cjs"
+        "default": "./dist/rrdom-nodejs.umd.cjs"
       }
     }
   },
@@ -55,7 +55,7 @@
     "cssom": "^0.5.0",
     "cssstyle": "^2.3.0",
     "nwsapi": "^2.2.0",
-    "howdygo-rrdom": "^2.0.0-alpha.37",
-    "howdygo-rrweb-snapshot": "^2.0.0-alpha.37"
+    "@howdygo/rrdom": "^2.0.0-alpha.37",
+    "@howdygo/rrweb-snapshot": "^2.0.0-alpha.37"
   }
 }

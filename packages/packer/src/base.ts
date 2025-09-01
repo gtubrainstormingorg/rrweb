@@ -1,4 +1,4 @@
-import type { eventWithTime } from 'howdygo-rrweb-types';
+import type { eventWithTime } from '@howdygo/rrweb-types';
 
 export type eventWithTimeAndPacker = eventWithTime & {
   v: string;

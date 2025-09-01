@@ -1,6 +1,6 @@
-import { record } from 'howdygo-rrweb';
-import type { recordOptions } from 'howdygo-rrweb';
-import type { eventWithTime } from 'howdygo-rrweb-types';
+import { record } from '@howdygo/rrweb';
+import type { recordOptions } from '@howdygo/rrweb';
+import type { eventWithTime } from '@howdygo/rrweb-types';
 import { MessageName, type RecordStartedMessage } from '~/types';
 import { isInCrossOriginIFrame } from '~/utils';
 

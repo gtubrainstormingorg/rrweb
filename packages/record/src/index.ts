@@ -1,3 +1,3 @@
-import { record } from 'howdygo-rrweb';
+import { record } from '@howdygo/rrweb';
 
 export { record };

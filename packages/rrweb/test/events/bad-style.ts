@@ -1,5 +1,5 @@
-import { EventType, IncrementalSource } from 'howdygo-rrweb-types';
-import type { eventWithTime } from 'howdygo-rrweb-types';
+import { EventType, IncrementalSource } from '@howdygo/rrweb-types';
+import type { eventWithTime } from '@howdygo/rrweb-types';
 
 /**
  * https://github.com/rrweb-io/rrweb/pull/1417

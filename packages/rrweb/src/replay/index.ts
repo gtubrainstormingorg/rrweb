@@ -10,7 +10,7 @@ import {
   type attributes,
   type serializedElementNodeWithId,
   toLowerCase,
-} from 'howdygo-rrweb-snapshot';
+} from '@howdygo/rrweb-snapshot';
 import {
   RRDocument,
   createOrGetNode,
@@ -18,7 +18,7 @@ import {
   buildFromDom,
   diff,
   getDefaultSN,
-} from 'howdygo-rrdom';
+} from '@howdygo/rrdom';
 import type {
   RRNode,
   RRElement,
@@ -28,7 +28,7 @@ import type {
   RRCanvasElement,
   ReplayerHandler,
   Mirror as RRDOMMirror,
-} from 'howdygo-rrdom';
+} from '@howdygo/rrdom';
 import * as mittProxy from 'mitt';
 import { polyfill as smoothscrollPolyfill } from './smoothscroll';
 import { Timer } from './timer';
@@ -44,7 +44,7 @@ import {
   IncrementalSource,
   MouseInteractions,
   ReplayerEvents,
-} from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
 import type {
   fullSnapshotEvent,
   eventWithTime,
@@ -70,7 +70,7 @@ import type {
   styleSheetRuleData,
   styleDeclarationData,
   adoptedStyleSheetData,
-} from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
 import {
   polyfill,
   queueToResolveTrees,

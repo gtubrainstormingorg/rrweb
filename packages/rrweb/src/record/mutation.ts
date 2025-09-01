@@ -10,7 +10,7 @@ import {
   isNativeShadowDom,
   getInputType,
   toLowerCase,
-} from 'howdygo-rrweb-snapshot';
+} from '@howdygo/rrweb-snapshot';
 import type { observerParam, MutationBufferParam } from '../types';
 import type {
   mutationRecord,
@@ -20,7 +20,7 @@ import type {
   addedNodeMutation,
   Optional,
   IWindow,
-} from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
 import {
   isBlocked,
   isAncestorRemoved,
@@ -33,7 +33,7 @@ import {
   getShadowHost,
   closestElementOfNode,
 } from '../utils';
-import dom from 'howdygo-rrweb-utils';
+import dom from '@howdygo/rrweb-utils';
 
 type DoubleLinkedListNode = {
   previous: DoubleLinkedListNode | null;

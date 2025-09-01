@@ -3,16 +3,16 @@ import type {
   mutationCallBack,
   scrollCallback,
   SamplingStrategy,
-} from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
 import {
   initMutationObserver,
   initScrollObserver,
   initAdoptedStyleSheetObserver,
 } from './observer';
 import { patch, inDom } from '../utils';
-import type { Mirror } from 'howdygo-rrweb-snapshot';
-import { isNativeShadowDom } from 'howdygo-rrweb-snapshot';
-import dom from 'howdygo-rrweb-utils';
+import type { Mirror } from '@howdygo/rrweb-snapshot';
+import { isNativeShadowDom } from '@howdygo/rrweb-snapshot';
+import dom from '@howdygo/rrweb-utils';
 
 type BypassOptions = Omit<
   MutationBufferParam,

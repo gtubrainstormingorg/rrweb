@@ -1,12 +1,12 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { chromium } from 'playwright';
-import { EventType, eventWithTime } from 'howdygo-rrweb-types';
-import type Player from 'howdygo-rrweb-player';
+import { EventType, eventWithTime } from '@howdygo/rrweb-types';
+import type Player from '@howdygo/rrweb-player';
 
 const rrwebScriptPath = path.resolve(
-  require.resolve('howdygo-rrweb-player'),
-  '../../dist/howdygo-rrweb-player.umd.cjs',
+  require.resolve('@howdygo/rrweb-player'),
+  '../../dist/@howdygo/rrweb-player.umd.cjs',
 );
 const rrwebStylePath = path.resolve(rrwebScriptPath, '../style.css');
 const rrwebRaw = fs.readFileSync(rrwebScriptPath, 'utf-8');
@@ -30,7 +30,7 @@ type RRvideoConfig = {
 
 const defaultConfig: Required<RRvideoConfig> = {
   input: '',
-  output: 'howdygo-rrvideo-output.webm',
+  output: '@howdygo/rrvideo-output.webm',
   headless: true,
   // A good trade-off value between quality and file size.
   resolutionRatio: 0.8,
@@ -97,7 +97,7 @@ function getMaxViewport(events: eventWithTime[]) {
 }
 
 export async function transformToVideo(options: RRvideoConfig) {
-  const defaultVideoDir = '__howdygo-rrvideo__temp__';
+  const defaultVideoDir = '__@howdygo/rrvideo__temp__';
   const config = { ...defaultConfig };
   if (!options.input) throw new Error('input is required');
   // If the output is not specified or undefined, use the default value.

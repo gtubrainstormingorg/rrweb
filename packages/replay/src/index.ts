@@ -3,8 +3,8 @@ import {
   type playerConfig,
   type PlayerMachineState,
   type SpeedMachineState,
-} from 'howdygo-rrweb';
-import 'howdygo-rrweb/dist/style.css';
+} from '@howdygo/rrweb';
+import '@howdygo/rrweb/dist/style.css';
 
 export {
   Replayer,

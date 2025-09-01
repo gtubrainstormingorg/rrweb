@@ -1,5 +1,5 @@
 import type { Replayer } from '../';
-import type { canvasMutationCommand } from 'howdygo-rrweb-types';
+import type { canvasMutationCommand } from '@howdygo/rrweb-types';
 import { deserializeArg } from './deserialize-args';
 
 // A map to track active mutation promises by `id`

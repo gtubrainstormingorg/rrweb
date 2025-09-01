@@ -30,7 +30,7 @@ describe('should be able to run cli', () => {
     });
     const outputFile = path.resolve(
       __dirname,
-      '../howdygo-rrvideo-output.webm',
+      '../@howdygo/rrvideo-output.webm',
     );
     expect(fs.existsSync(outputFile)).toBe(true);
     fs.removeSync(outputFile);

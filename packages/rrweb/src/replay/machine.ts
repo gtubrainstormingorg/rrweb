@@ -11,7 +11,7 @@ import {
   EventType,
   type Emitter,
   IncrementalSource,
-} from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
 import { Timer, addDelay } from './timer';
 
 export type PlayerContext = {

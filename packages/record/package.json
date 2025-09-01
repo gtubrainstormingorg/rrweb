@@ -1,5 +1,5 @@
 {
-  "name": "howdygo-rrweb-record",
+  "name": "@howdygo/rrweb-record",
   "version": "2.0.0-alpha.37",
   "publishConfig": {
     "access": "public"
@@ -27,19 +27,19 @@
   },
   "license": "MIT",
   "type": "module",
-  "main": "./dist/howdygo-rrweb-record.cjs",
-  "module": "./dist/howdygo-rrweb-record.js",
-  "unpkg": "./dist/howdygo-rrweb-record.umd.cjs",
+  "main": "./dist/rrweb-record.cjs",
+  "module": "./dist/rrweb-record.js",
+  "unpkg": "./dist/rrweb-record.umd.cjs",
   "typings": "dist/index.d.ts",
   "exports": {
     ".": {
       "import": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/howdygo-rrweb-record.js"
+        "default": "./dist/rrweb-record.js"
       },
       "require": {
         "types": "./dist/index.d.cts",
-        "default": "./dist/howdygo-rrweb-record.cjs"
+        "default": "./dist/rrweb-record.cjs"
       }
     }
   },
@@ -55,8 +55,8 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "howdygo-rrweb-types": "^2.0.0-alpha.37",
-    "howdygo-rrweb": "^2.0.0-alpha.37"
+    "@howdygo/rrweb-types": "^2.0.0-alpha.37",
+    "@howdygo/rrweb": "^2.0.0-alpha.37"
   },
   "browserslist": [
     "supports es6-class"

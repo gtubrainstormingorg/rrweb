@@ -4,7 +4,7 @@ import {
   type canvasMutationCommand,
   type canvasMutationData,
   type canvasMutationParam,
-} from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
 import webglMutation from './webgl';
 import canvas2DMutation from './2d';
 

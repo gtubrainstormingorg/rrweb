@@ -9,7 +9,7 @@ import {
   EventType,
   IncrementalSource,
   CanvasContext,
-} from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
 import {
   assertSnapshot,
   launchPuppeteer,
@@ -17,7 +17,7 @@ import {
   waitForRAF,
   waitForIFrameLoad,
 } from '../utils';
-import type { ICanvas } from 'howdygo-rrweb-snapshot';
+import type { ICanvas } from '@howdygo/rrweb-snapshot';
 
 interface ISuite {
   code: string;
@@ -52,7 +52,7 @@ const setup = function (
     await ctx.page.goto('about:blank');
     await ctx.page.setContent(content);
     await ctx.page.addScriptTag({
-      path: path.resolve(__dirname, '../../dist/howdygo-rrweb.umd.cjs'),
+      path: path.resolve(__dirname, '../../dist/@howdygo/rrweb.umd.cjs'),
     });
     ctx.events = [];
     await ctx.page.exposeFunction('emit', (e: eventWithTime) => {

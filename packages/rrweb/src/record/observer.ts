@@ -4,7 +4,7 @@ import {
   Mirror,
   getInputType,
   toLowerCase,
-} from 'howdygo-rrweb-snapshot';
+} from '@howdygo/rrweb-snapshot';
 import type { FontFaceSet } from 'css-font-loading-module';
 import {
   throttle,
@@ -25,7 +25,7 @@ import {
   MouseInteractions,
   PointerTypes,
   MediaInteractions,
-} from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
 import type {
   mutationCallBack,
   mousemoveCallBack,
@@ -49,10 +49,10 @@ import type {
   SelectionRange,
   selectionCallback,
   customElementCallback,
-} from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
 import MutationBuffer from './mutation';
 import { callbackWrapper } from './error-handler';
-import dom, { mutationObserverCtor } from 'howdygo-rrweb-utils';
+import dom, { mutationObserverCtor } from '@howdygo/rrweb-utils';
 
 export const mutationBuffers: MutationBuffer[] = [];
 

@@ -29,7 +29,7 @@ import {
   absolutifyURLs,
   markCssSplits,
 } from './utils';
-import dom from 'howdygo-rrweb-utils';
+import dom from '@howdygo/rrweb-utils';
 
 let _id = 1;
 const tagNameRegex = new RegExp('[^a-z0-9-_:]');

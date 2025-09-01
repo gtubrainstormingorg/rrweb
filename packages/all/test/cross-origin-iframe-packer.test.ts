@@ -11,14 +11,14 @@ import type {
   eventWithTime,
   listenerHandler,
   mutationData,
-} from 'howdygo-rrweb-types';
-import { unpack } from 'howdygo-rrweb-packer';
+} from '@howdygo/rrweb-types';
+import { unpack } from '@howdygo/rrweb-packer';
 import * as fs from 'fs';
 import * as path from 'path';
 import type * as puppeteer from 'puppeteer';
-import type { recordOptions } from 'howdygo-rrweb';
-import type {} from 'howdygo-rrweb-types';
-import { EventType } from 'howdygo-rrweb-types';
+import type { recordOptions } from '@howdygo/rrweb';
+import type {} from '@howdygo/rrweb-types';
+import { EventType } from '@howdygo/rrweb-types';
 import {
   assertSnapshot,
   getServerURL,
@@ -57,7 +57,7 @@ async function injectRecordScript(
   options?: ExtraOptions,
 ) {
   await frame.addScriptTag({
-    path: path.resolve(__dirname, '../dist/howdygo-rrweb-all.umd.cjs'),
+    path: path.resolve(__dirname, '../dist/@howdygo/rrweb-all.umd.cjs'),
   });
   options = options || {};
   await frame.evaluate((options) => {

@@ -1,5 +1,5 @@
 {
-  "name": "howdygo-rrweb-replay",
+  "name": "@howdygo/rrweb-replay",
   "version": "2.0.0-alpha.37",
   "publishConfig": {
     "access": "public"
@@ -27,19 +27,19 @@
   },
   "license": "MIT",
   "type": "module",
-  "main": "./dist/howdygo-rrweb-replay.cjs",
-  "module": "./dist/howdygo-rrweb-replay.js",
-  "unpkg": "./dist/howdygo-rrweb-replay.umd.cjs",
+  "main": "./dist/rrweb-replay.cjs",
+  "module": "./dist/rrweb-replay.js",
+  "unpkg": "./dist/rrweb-replay.umd.cjs",
   "typings": "dist/index.d.ts",
   "exports": {
     ".": {
       "import": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/howdygo-rrweb-replay.js"
+        "default": "./dist/rrweb-replay.js"
       },
       "require": {
         "types": "./dist/index.d.cts",
-        "default": "./dist/howdygo-rrweb-replay.cjs"
+        "default": "./dist/rrweb-replay.cjs"
       }
     },
     "./dist/style.css": "./dist/style.css"
@@ -56,8 +56,8 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "howdygo-rrweb-types": "^2.0.0-alpha.37",
-    "howdygo-rrweb": "^2.0.0-alpha.37"
+    "@howdygo/rrweb-types": "^2.0.0-alpha.37",
+    "@howdygo/rrweb": "^2.0.0-alpha.37"
   },
   "browserslist": [
     "supports es6-class"

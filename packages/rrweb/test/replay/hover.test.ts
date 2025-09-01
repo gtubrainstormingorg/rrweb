@@ -28,7 +28,7 @@ describe('replayer', function () {
 
     const bundlePath = path.resolve(
       __dirname,
-      '../../dist/howdygo-rrweb.umd.cjs',
+      '../../dist/@howdygo/rrweb.umd.cjs',
     );
     const stylePath = path.resolve(
       __dirname,

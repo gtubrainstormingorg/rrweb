@@ -1,5 +1,5 @@
-import type { attributeMutation } from 'howdygo-rrweb-types';
-import { RRNode } from 'howdygo-rrdom';
+import type { attributeMutation } from '@howdygo/rrweb-types';
+import { RRNode } from '@howdygo/rrdom';
 
 /**
  * Checks if the dialog is a top level dialog and applies the dialog to the top level

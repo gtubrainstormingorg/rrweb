@@ -1,5 +1,5 @@
 {
-  "name": "howdygo-rrweb-snapshot",
+  "name": "@howdygo/rrweb-snapshot",
   "version": "2.0.0-alpha.37",
   "description": "rrweb's component to take a snapshot of DOM, aka DOM serializer",
   "scripts": {
@@ -12,7 +12,7 @@
     "test:update": "yarn build && vitest run --update",
     "bench": "vite build && vitest bench",
     "dev": "vite build --watch",
-    "build": "yarn turbo prepublish -F howdygo-rrweb-snapshot",
+    "build": "yarn turbo prepublish -F @howdygo/rrweb-snapshot",
     "check-types": "tsc --noEmit",
     "prepublish": "yarn check-types && vite build",
     "lint": "yarn eslint src"
@@ -23,23 +23,23 @@
     "url": "git+https://github.com/rrweb-io/rrweb.git"
   },
   "keywords": [
-    "howdygo-rrweb",
+    "@howdygo/rrweb",
     "snapshot",
     "DOM"
   ],
-  "main": "./dist/howdygo-rrweb-snapshot.umd.cjs",
-  "module": "./dist/howdygo-rrweb-snapshot.js",
-  "unpkg": "./dist/howdygo-rrweb-snapshot.umd.cjs",
+  "main": "./dist/rrweb-snapshot.umd.cjs",
+  "module": "./dist/rrweb-snapshot.js",
+  "unpkg": "./dist/rrweb-snapshot.umd.cjs",
   "typings": "dist/index.d.ts",
   "exports": {
     ".": {
       "import": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/howdygo-rrweb-snapshot.js"
+        "default": "./dist/rrweb-snapshot.js"
       },
       "require": {
         "types": "./dist/index.d.cts",
-        "default": "./dist/howdygo-rrweb-snapshot.umd.cjs"
+        "default": "./dist/rrweb-snapshot.umd.cjs"
       }
     }
   },
@@ -52,12 +52,12 @@
   "bugs": {
     "url": "https://github.com/rrweb-io/rrweb/issues"
   },
-  "homepage": "https://github.com/rrweb-io/rrweb/tree/master/packages/howdygo-rrweb-snapshot#readme",
+  "homepage": "https://github.com/rrweb-io/rrweb/tree/master/packages/@howdygo/rrweb-snapshot#readme",
   "devDependencies": {
     "@types/jsdom": "^20.0.0",
     "@types/node": "^18.15.11",
     "@types/puppeteer": "^5.4.4",
-    "howdygo-rrweb-utils": "^2.0.0-alpha.37",
+    "@howdygo/rrweb-utils": "^2.0.0-alpha.37",
     "puppeteer": "^17.1.3",
     "ts-node": "^7.0.1",
     "tslib": "^1.9.3",

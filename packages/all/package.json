@@ -1,8 +1,8 @@
 {
-  "name": "howdygo-rrweb-all",
+  "name": "@howdygo/rrweb-all",
   "version": "2.0.0-alpha.37",
   "publishConfig": {
-    "access": "public"
+    "access": "private"
   },
   "keywords": [
     "rrweb",
@@ -27,19 +27,19 @@
   },
   "license": "MIT",
   "type": "module",
-  "main": "./dist/howdygo-rrweb-all.cjs",
-  "module": "./dist/howdygo-rrweb-all.js",
-  "unpkg": "./dist/howdygo-rrweb-all.umd.cjs",
+  "main": "./dist/rrweb-all.cjs",
+  "module": "./dist/rrweb-all.js",
+  "unpkg": "./dist/rrweb-all.umd.cjs",
   "typings": "dist/index.d.ts",
   "exports": {
     ".": {
       "import": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/howdygo-rrweb-all.js"
+        "default": "./dist/rrweb-all.js"
       },
       "require": {
         "types": "./dist/index.d.cts",
-        "default": "./dist/howdygo-rrweb-all.cjs"
+        "default": "./dist/rrweb-all.cjs"
       }
     }
   },
@@ -56,9 +56,9 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "howdygo-rrweb-types": "^2.0.0-alpha.37",
-    "howdygo-rrweb-packer": "^2.0.0-alpha.37",
-    "howdygo-rrweb": "^2.0.0-alpha.37"
+    "@howdygo/rrweb-types": "^2.0.0-alpha.37",
+    "@howdygo/rrweb-packer": "^2.0.0-alpha.37",
+    "@howdygo/rrweb": "^2.0.0-alpha.37"
   },
   "browserslist": [
     "supports es6-class"

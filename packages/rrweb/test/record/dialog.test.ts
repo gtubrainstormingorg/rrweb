@@ -15,7 +15,7 @@ import {
   EventType,
   eventWithTime,
   listenerHandler,
-} from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
 import { recordOptions } from '../../src/types';
 
 interface IWindow extends Window {
@@ -58,7 +58,7 @@ describe('dialog', () => {
 
     const bundlePath = path.resolve(
       __dirname,
-      '../../dist/howdygo-rrweb.umd.cjs',
+      '../../dist/@howdygo/rrweb.umd.cjs',
     );
     code = fs.readFileSync(bundlePath, 'utf8');
   });
@@ -80,7 +80,7 @@ describe('dialog', () => {
 
     await page.goto(`${serverURL}/html/dialog.html`);
     await page.addScriptTag({
-      path: path.resolve(__dirname, '../../dist/howdygo-rrweb.umd.cjs'),
+      path: path.resolve(__dirname, '../../dist/@howdygo/rrweb.umd.cjs'),
     });
     await waitForRAF(page);
     events = [];

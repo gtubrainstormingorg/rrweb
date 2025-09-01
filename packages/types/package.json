@@ -1,12 +1,12 @@
 {
-  "name": "howdygo-rrweb-types",
+  "name": "@howdygo/rrweb-types",
   "version": "2.0.0-alpha.37",
   "publishConfig": {
     "access": "public"
   },
   "keywords": [
-    "howdygo-rrweb",
-    "howdygo-rrweb-types"
+    "@howdygo/rrweb",
+    "@howdygo/rrweb-types"
   ],
   "scripts": {
     "dev": "vite build --watch",
@@ -15,7 +15,7 @@
     "prepublish": "tsc -noEmit && vite build",
     "lint": "yarn eslint src/**/*.ts"
   },
-  "homepage": "https://github.com/rrweb-io/rrweb/tree/main/packages/howdygo-rrweb-types#readme",
+  "homepage": "https://github.com/rrweb-io/rrweb/tree/main/packages/@howdygo/rrweb-types#readme",
   "bugs": {
     "url": "https://github.com/rrweb-io/rrweb/issues"
   },
@@ -25,19 +25,19 @@
   },
   "license": "MIT",
   "type": "module",
-  "main": "./dist/howdygo-rrweb-types.umd.cjs",
-  "module": "./dist/howdygo-rrweb-types.js",
-  "unpkg": "./dist/howdygo-rrweb-types.umd.cjs",
+  "main": "./dist/rrweb-types.umd.cjs",
+  "module": "./dist/rrweb-types.js",
+  "unpkg": "./dist/rrweb-types.umd.cjs",
   "typings": "dist/index.d.ts",
   "exports": {
     ".": {
       "import": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/howdygo-rrweb-types.js"
+        "default": "./dist/rrweb-types.js"
       },
       "require": {
         "types": "./dist/index.d.cts",
-        "default": "./dist/howdygo-rrweb-types.umd.cjs"
+        "default": "./dist/rrweb-types.umd.cjs"
       }
     }
   },
@@ -50,7 +50,7 @@
     "vite-plugin-dts": "^3.9.1"
   },
   "dependencies": {
-    "howdygo-rrweb-snapshot": "^2.0.0-alpha.37"
+    "@howdygo/rrweb-snapshot": "^2.0.0-alpha.37"
   },
   "browserslist": [
     "supports es6-class"

@@ -11,7 +11,7 @@ import {
   IncrementalSource,
   styleSheetRuleData,
   selectionData,
-} from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
 import {
   assertSnapshot,
   getServerURL,
@@ -50,7 +50,7 @@ const setup = function (this: ISuite, content: string): ISuite {
       devtools: true,
     });
 
-    const bundlePath = path.resolve(__dirname, '../dist/howdygo-rrweb.umd.cjs');
+    const bundlePath = path.resolve(__dirname, '../dist/@howdygo/rrweb.umd.cjs');
     ctx.code = fs.readFileSync(bundlePath, 'utf8');
   });
 

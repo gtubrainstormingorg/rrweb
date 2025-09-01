@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { vi } from 'vitest';
 import type { Page } from 'puppeteer';
-import type { eventWithTime } from 'howdygo-rrweb-types';
+import type { eventWithTime } from '@howdygo/rrweb-types';
 import type { recordOptions } from '../../src/types';
 import { startServer, launchPuppeteer, ISuite, getServerURL } from '../utils';
 
@@ -91,7 +91,7 @@ describe('benchmark: mutation observer', () => {
 
   const addRecordingScript = async (page: Page) => {
     // const scriptUrl = `${getServerURL(server)}/rrweb-1.1.3.js`;
-    const scriptUrl = `${getServerURL(server)}/howdygo-rrweb.umd.cjs`;
+    const scriptUrl = `${getServerURL(server)}/@howdygo/rrweb.umd.cjs`;
     await page.evaluate((url) => {
       const scriptEl = document.createElement('script');
       scriptEl.src = url;

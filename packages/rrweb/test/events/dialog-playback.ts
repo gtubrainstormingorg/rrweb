@@ -1,4 +1,4 @@
-import { eventWithTime, IncrementalSource } from 'howdygo-rrweb-types';
+import { eventWithTime, IncrementalSource } from '@howdygo/rrweb-types';
 
 const startTime = 1900000000;
 export const closedFullSnapshotTime = 132;

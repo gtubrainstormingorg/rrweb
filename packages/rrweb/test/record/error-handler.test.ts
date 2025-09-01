@@ -3,7 +3,7 @@ import * as path from 'path';
 import type * as puppeteer from 'puppeteer';
 import { vi } from 'vitest';
 import type { recordOptions } from '../../src/types';
-import { listenerHandler, eventWithTime, EventType } from 'howdygo-rrweb-types';
+import { listenerHandler, eventWithTime, EventType } from '@howdygo/rrweb-types';
 import { launchPuppeteer } from '../utils';
 import {
   callbackWrapper,
@@ -40,7 +40,7 @@ const setup = function (
 
     const bundlePath = path.resolve(
       __dirname,
-      '../../dist/howdygo-rrweb.umd.cjs',
+      '../../dist/@howdygo/rrweb.umd.cjs',
     );
     ctx.code = fs.readFileSync(bundlePath, 'utf8');
   });

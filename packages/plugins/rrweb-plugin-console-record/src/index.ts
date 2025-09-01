@@ -2,8 +2,8 @@ import type {
   listenerHandler,
   RecordPlugin,
   IWindow,
-} from 'howdygo-rrweb-types';
-import { utils } from 'howdygo-rrweb';
+} from '@howdygo/rrweb-types';
+import { utils } from '@howdygo/rrweb';
 import { ErrorStackParser, StackFrame } from './error-stack-parser';
 import { stringify } from './stringify';
 

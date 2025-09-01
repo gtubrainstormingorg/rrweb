@@ -3,7 +3,7 @@ import {
   type MaskInputOptions,
   type SlimDOMOptions,
   createMirror,
-} from 'howdygo-rrweb-snapshot';
+} from '@howdygo/rrweb-snapshot';
 import { initObservers, mutationBuffers } from './observer';
 import {
   on,
@@ -29,7 +29,7 @@ import {
   type adoptedStyleSheetParam,
   type IWindow,
   type mousePosition,
-} from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
 import type { CrossOriginIframeMessageEventContent } from '../types';
 import { IframeManager } from './iframe-manager';
 import { ShadowDomManager } from './shadow-dom-manager';
@@ -41,7 +41,7 @@ import {
   registerErrorHandler,
   unregisterErrorHandler,
 } from './error-handler';
-import dom from 'howdygo-rrweb-utils';
+import dom from '@howdygo/rrweb-utils';
 
 let wrappedEmit!: (e: eventWithoutTime, isCheckout?: boolean) => void;
 
@@ -223,7 +223,7 @@ function record<T = eventWithTime>(
       emit?.(eventProcessor(e), isCheckout);
     } else if (passEmitsToParent) {
       const message: CrossOriginIframeMessageEventContent<T> = {
-        type: 'howdygo-rrweb',
+        type: '@howdygo/rrweb',
         event: eventProcessor(e),
         origin: window.location.origin,
         isCheckout,

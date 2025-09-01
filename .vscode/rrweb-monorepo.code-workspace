@@ -37,11 +37,11 @@
       "path": "../packages/replay"
     },
     {
-      "name": "howdygo-rrweb-types",
+      "name": "@howdygo/rrweb-types",
       "path": "../packages/types"
     },
     {
-      "name": "howdygo-rrweb-utils",
+      "name": "@howdygo/rrweb-utils",
       "path": "../packages/utils"
     },
     {

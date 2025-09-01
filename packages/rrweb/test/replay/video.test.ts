@@ -49,7 +49,7 @@ describe('video', () => {
 
     const bundlePath = path.resolve(
       __dirname,
-      '../../dist/howdygo-rrweb.umd.cjs',
+      '../../dist/@howdygo/rrweb.umd.cjs',
     );
     code = fs.readFileSync(bundlePath, 'utf8');
   });

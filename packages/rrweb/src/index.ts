@@ -15,7 +15,7 @@ export {
   MouseInteractions,
   ReplayerEvents,
   type eventWithTime,
-} from 'howdygo-rrweb-types';
+} from '@howdygo/rrweb-types';
 
 // exports style.css from replay
 import './replay/styles/style.css';
