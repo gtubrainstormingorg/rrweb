@@ -1,4 +1,7 @@
-import type { elementNode, serializedNodeWithId } from '@howdygo/rrweb-snapshot';
+import type {
+  elementNode,
+  serializedNodeWithId,
+} from '@howdygo/rrweb-snapshot';
 import { stringifyRule } from '@howdygo/rrweb-snapshot';
 import type {
   adoptedStyleSheetCallback,

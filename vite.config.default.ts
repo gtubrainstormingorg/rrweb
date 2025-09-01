@@ -136,7 +136,7 @@ export default function (
 
       rollupOptions: {
         output: {
-          exports: "named",
+          exports: 'named',
         },
       },
     },
