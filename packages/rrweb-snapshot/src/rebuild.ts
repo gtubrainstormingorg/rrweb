@@ -192,9 +192,11 @@ function buildNode(
         node = doc.createElement(tagName);
       }
 
-      if (tagName === 'iframe' && !n.attributes.src || !n.attributes.rr_src) {
+      if ((tagName === 'iframe' && !n.attributes.src) || !n.attributes.rr_src) {
         // Only set iframe src in Safari (both mobile and desktop) due to Safari-specific nested iframe handling requirements
-        const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome|Chromium|Edge/.test(navigator.userAgent);
+        const isSafari =
+          /Safari/.test(navigator.userAgent) &&
+          !/Chrome|Chromium|Edge/.test(navigator.userAgent);
         if (isSafari) {
           node.setAttribute('src', '/iframe/rrweb.html');
         }
