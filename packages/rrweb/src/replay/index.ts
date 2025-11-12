@@ -205,6 +205,7 @@ export class Replayer {
       disableScroll: false, // Disable scroll mutations
       logger: console,
       lazyLoadImages: false, // Enable lazy loading for images by default
+      disableHover: false,
     };
     this.config = Object.assign({}, defaultConfig, config);
 
@@ -2222,7 +2223,9 @@ export class Replayer {
     if (!isSync) {
       this.drawMouseTail({ x: _x, y: _y });
     }
-    this.hoverElements(target as Element);
+    if (!this.config.disableHover) {
+      this.hoverElements(target as Element);
+    }
   }
 
   private drawMouseTail(position: { x: number; y: number }) {

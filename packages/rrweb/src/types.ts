@@ -199,6 +199,7 @@ export type playerConfig = {
   disableScroll: boolean;
   plugins?: ReplayPlugin[];
   lazyLoadImages?: boolean;
+  disableHover?: boolean;
 };
 
 export type missingNode = {
