@@ -8,6 +8,40 @@ const activeCanvasMutations = new Map<
   Map<string, { cancelled: boolean }>
 >();
 
+/**
+ * Optimizes canvas mutations by replacing clearRect + drawImage patterns
+ * with globalCompositeOperation = 'copy' + drawImage, which is more efficient.
+ */
+function optimizeMutations(
+  mutations: canvasMutationCommand[],
+): canvasMutationCommand[] {
+  const optimized: canvasMutationCommand[] = [];
+
+  for (let i = 0; i < mutations.length; i++) {
+    const current = mutations[i];
+    const next = mutations[i + 1];
+
+    // Check for clearRect followed by drawImage pattern
+    if (
+      current.property === 'clearRect' &&
+      next?.property === 'drawImage'
+    ) {
+      // Replace clearRect with globalCompositeOperation = 'copy'
+      optimized.push({
+        property: 'globalCompositeOperation',
+        args: ['copy'],
+        setter: true,
+      });
+      // Skip the clearRect, the next iteration will add drawImage
+      continue;
+    }
+
+    optimized.push(current);
+  }
+
+  return optimized;
+}
+
 export default async function canvasMutation({
   event,
   mutations,
@@ -45,8 +79,11 @@ export default async function canvasMutation({
 
   const mutationPromise = (async () => {
     try {
+      // Optimize clearRect + drawImage patterns
+      const optimizedMutations = optimizeMutations(mutations);
+
       // Step 1: Deserialize args (they may be async)
-      const mutationArgsPromises = mutations.map(
+      const mutationArgsPromises = optimizedMutations.map(
         async (mutation: canvasMutationCommand): Promise<unknown[]> => {
           return Promise.all(mutation.args.map(deserializeArg(imageMap, ctx)));
         },
@@ -64,7 +101,7 @@ export default async function canvasMutation({
 
       // Step 3: Apply all mutations
       args.forEach((args, index) => {
-        const mutation = mutations[index];
+        const mutation = optimizedMutations[index];
         try {
           if (mutation.setter) {
             // Skip some read-only type checks

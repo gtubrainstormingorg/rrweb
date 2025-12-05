@@ -263,13 +263,13 @@ export class CanvasManager {
               id,
               type: CanvasContext['2D'],
               commands: [
+                // TODO this can potentially get removed
                 {
-                  property: 'globalCompositeOperation',
-                  args: ['copy'],
-                  setter: true,
+                  property: 'clearRect', // wipe canvas
+                  args: [0, 0, canvas.width, canvas.height],
                 },
                 {
-                  property: 'drawImage',
+                  property: 'drawImage', // draws (semi-transparent) image
                   args: [
                     {
                       rr_type: 'ImageBitmap',
