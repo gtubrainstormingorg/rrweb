@@ -13,6 +13,9 @@ import rebuild, {
   buildNodeWithSN,
   adaptCssForReplay,
   createCache,
+  preloadCanvasImage,
+  extractCanvasDataURLs,
+  preloadAllCanvasImages,
 } from './rebuild';
 export * from './types';
 export * from './utils';
@@ -24,6 +27,9 @@ export {
   buildNodeWithSN,
   adaptCssForReplay,
   createCache,
+  preloadCanvasImage,
+  extractCanvasDataURLs,
+  preloadAllCanvasImages,
   transformAttribute,
   ignoreAttribute,
   visitSnapshot,

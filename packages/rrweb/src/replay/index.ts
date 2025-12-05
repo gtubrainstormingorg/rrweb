@@ -645,8 +645,56 @@ export class Replayer {
     }
   };
 
+  // Track which canvas nodes have mutations during sync - used by rebuild to decide
+  // whether to draw the snapshot's rr_dataURL or skip it (because a mutation will update it)
+  private canvasNodeIdsWithPendingMutations: Set<number> = new Set();
+
   private applyEventsSynchronously = (events: Array<eventWithTime>) => {
+    // Optimization: When seeking, we only need the LAST canvas mutation for each canvas.
+    // All intermediate mutations are wasted work that also causes visual delays.
+    // Build a set of canvas mutation events to skip (all except the last per canvas).
+    const canvasMutationsToSkip = new Set<eventWithTime>();
+    
+    // Clear and repopulate the set of canvas nodes with pending mutations
+    this.canvasNodeIdsWithPendingMutations.clear();
+    
+    if (this.config.UNSAFE_replayCanvas) {
+      // Find the last canvas mutation for each canvas node ID
+      const lastCanvasMutationByNodeId = new Map<number, eventWithTime>();
+      
+      for (const event of events) {
+        if (
+          event.type === EventType.IncrementalSnapshot &&
+          event.data.source === IncrementalSource.CanvasMutation
+        ) {
+          const nodeId = (event.data as canvasMutationData).id;
+          lastCanvasMutationByNodeId.set(nodeId, event);
+          // Track that this canvas has mutations - used by rebuild
+          this.canvasNodeIdsWithPendingMutations.add(nodeId);
+        }
+      }
+      
+      // Mark all canvas mutations except the last one for each canvas as "skip"
+      for (const event of events) {
+        if (
+          event.type === EventType.IncrementalSnapshot &&
+          event.data.source === IncrementalSource.CanvasMutation
+        ) {
+          const nodeId = (event.data as canvasMutationData).id;
+          const lastMutation = lastCanvasMutationByNodeId.get(nodeId);
+          if (event !== lastMutation) {
+            canvasMutationsToSkip.add(event);
+          }
+        }
+      }
+    }
+    
     for (const event of events) {
+      // Skip intermediate canvas mutations - only apply the last one per canvas
+      if (canvasMutationsToSkip.has(event)) {
+        continue;
+      }
+      
       switch (event.type) {
         case EventType.DomContentLoaded:
         case EventType.Load:
@@ -843,13 +891,17 @@ export class Replayer {
     }
 
     this.mirror.reset();
+    // When seeking (isSync=true), only skip drawing canvas rr_dataURL for canvases
+    // that have pending mutations. Those canvases will be updated by the mutations.
+    // Canvases WITHOUT mutations still need their rr_dataURL drawn.
     rebuild(event.data.node, {
       doc: this.iframe.contentDocument,
       afterAppend,
       cache: this.cache,
       mirror: this.mirror,
       lazyLoadImages: this.config.lazyLoadImages,
-    });
+      canvasNodeIdsToSkip: isSync ? this.canvasNodeIdsWithPendingMutations : undefined,
+    } as Parameters<typeof rebuild>[1]);
     afterAppend(this.iframe.contentDocument, event.data.node.id);
 
     for (const { mutationInQueue, builtNode } of collectedIframes) {

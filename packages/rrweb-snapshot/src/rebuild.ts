@@ -53,6 +53,73 @@ const tagMap: tagMap = {
   lineargradient: 'linearGradient',
   radialgradient: 'radialGradient',
 };
+
+// Global cache for canvas data URL images to avoid flicker during seeking/replay
+// The cache uses the data URL as key, so identical images are reused
+const canvasDataURLImageCache: Map<string, HTMLImageElement> = new Map();
+
+/**
+ * Get or create a cached image for a data URL.
+ * If the image is already cached and loaded, it can be drawn synchronously.
+ */
+function getCachedCanvasImage(dataURL: string): HTMLImageElement {
+  let image = canvasDataURLImageCache.get(dataURL);
+  if (!image) {
+    image = new Image();
+    // Store in cache before setting src so subsequent calls get the same image
+    canvasDataURLImageCache.set(dataURL, image);
+    image.src = dataURL;
+  }
+  return image;
+}
+
+/**
+ * Preload a canvas data URL image into the cache.
+ * Returns a promise that resolves when the image is loaded.
+ */
+export function preloadCanvasImage(dataURL: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const image = getCachedCanvasImage(dataURL);
+    if (image.complete && image.naturalWidth > 0) {
+      resolve();
+    } else {
+      image.onload = () => resolve();
+      image.onerror = () => reject(new Error(`Failed to preload canvas image`));
+    }
+  });
+}
+
+/**
+ * Extract all canvas rr_dataURL values from a serialized node tree.
+ * Used for preloading canvas images before replay.
+ */
+export function extractCanvasDataURLs(node: serializedNodeWithId): string[] {
+  const dataURLs: string[] = [];
+  
+  function walk(n: serializedNodeWithId) {
+    if (n.type === NodeType.Element) {
+      const el = n as serializedElementNodeWithId;
+      if (el.tagName === 'canvas' && el.attributes.rr_dataURL) {
+        dataURLs.push(el.attributes.rr_dataURL as string);
+      }
+      if (el.childNodes) {
+        el.childNodes.forEach(walk);
+      }
+    }
+  }
+  
+  walk(node);
+  return dataURLs;
+}
+
+/**
+ * Preload all canvas images from a serialized node tree.
+ * Call this before replay to eliminate canvas flicker.
+ */
+export function preloadAllCanvasImages(node: serializedNodeWithId): Promise<void[]> {
+  const dataURLs = extractCanvasDataURLs(node);
+  return Promise.all(dataURLs.map(preloadCanvasImage));
+}
 function getTagName(n: elementNode): string {
   let tagName = tagMap[n.tagName] ? tagMap[n.tagName] : n.tagName;
   if (tagName === 'link' && n.attributes._cssText) {
@@ -159,9 +226,16 @@ function buildNode(
     hackCss: boolean;
     cache: BuildCache;
     lazyLoadImages?: boolean;
+    /**
+     * Set of canvas node IDs that have pending mutations.
+     * For these canvases, skip drawing rr_dataURL during rebuild because
+     * a canvas mutation will update them to the correct state.
+     * Canvases NOT in this set will still draw their rr_dataURL.
+     */
+    canvasNodeIdsToSkip?: Set<number>;
   },
 ): Node | null {
-  const { doc, hackCss, cache, lazyLoadImages } = options;
+  const { doc, hackCss, cache, lazyLoadImages, canvasNodeIdsToSkip } = options;
   switch (n.type) {
     case NodeType.Document:
       return doc.implementation.createDocument(null, '', null);
@@ -320,21 +394,42 @@ function buildNode(
         const value = specialAttributes[name];
         // handle internal attributes
         if (tagName === 'canvas' && name === 'rr_dataURL') {
-          const image = doc.createElement('img');
-          image.onload = () => {
-            const ctx = (node as HTMLCanvasElement).getContext('2d');
-            if (ctx) {
-              ctx.drawImage(image, 0, 0, image.width, image.height);
-            }
-          };
-          image.src = value.toString();
           type RRCanvasElement = {
             RRNodeType: NodeType;
             rr_dataURL: string;
           };
           // If the canvas element is created in RRDom runtime (seeking to a time point), the canvas context isn't supported. So the data has to be stored and not handled until diff process. https://github.com/rrweb-io/rrweb/pull/944
-          if ((node as unknown as RRCanvasElement).RRNodeType)
+          if ((node as unknown as RRCanvasElement).RRNodeType) {
             (node as unknown as RRCanvasElement).rr_dataURL = value.toString();
+          } else if (canvasNodeIdsToSkip?.has(n.id)) {
+            // This canvas has pending mutations that will update it to the correct state.
+            // Skip drawing the full snapshot's canvas image to avoid flicker from showing
+            // the old snapshot state briefly before the mutation applies.
+            // Still preload the image for cache so it's ready if needed later.
+            getCachedCanvasImage(value.toString());
+          } else {
+            // For real DOM canvas, use cached image to avoid flicker when seeking
+            const canvas = node as HTMLCanvasElement;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              const dataURL = value.toString();
+              const image = getCachedCanvasImage(dataURL);
+              
+              if (image.complete && image.naturalWidth > 0) {
+                // Image is already loaded (cached), draw immediately - no flicker!
+                ctx.drawImage(image, 0, 0, image.width, image.height);
+              } else {
+                // Image is still loading (first time), set up onload handler
+                // This will still flicker on first play, but not on subsequent seeks
+                image.onload = () => {
+                  // Verify the cached image hasn't been replaced
+                  if (canvasDataURLImageCache.get(dataURL) === image) {
+                    ctx.drawImage(image, 0, 0, image.width, image.height);
+                  }
+                };
+              }
+            }
+          }
         } else if (tagName === 'img' && name === 'rr_dataURL') {
           const image = node as HTMLImageElement;
           if (!image.currentSrc.startsWith('data:')) {
@@ -437,6 +532,13 @@ export function buildNodeWithSN(
      */
     afterAppend?: (n: Node, id: number) => unknown;
     cache: BuildCache;
+    /**
+     * Set of canvas node IDs that have pending mutations.
+     * For these canvases, skip drawing rr_dataURL during rebuild because
+     * a canvas mutation will update them to the correct state.
+     * Canvases NOT in this set will still draw their rr_dataURL.
+     */
+    canvasNodeIdsToSkip?: Set<number>;
   },
 ): Node | null {
   const {
@@ -447,6 +549,7 @@ export function buildNodeWithSN(
     lazyLoadImages = false,
     afterAppend,
     cache,
+    canvasNodeIdsToSkip,
   } = options;
   /**
    * Add a check to see if the node is already in the mirror. If it is, we can skip the whole process.
@@ -461,7 +564,7 @@ export function buildNodeWithSN(
     // For safety concern, check if the node in mirror is the same as the node we are trying to build
     if (isNodeMetaEqual(meta, n)) return mirror.getNode(n.id);
   }
-  let node = buildNode(n, { doc, hackCss, cache, lazyLoadImages });
+  let node = buildNode(n, { doc, hackCss, cache, lazyLoadImages, canvasNodeIdsToSkip });
   if (!node) {
     return null;
   }
@@ -514,6 +617,7 @@ export function buildNodeWithSN(
         lazyLoadImages,
         afterAppend,
         cache,
+        canvasNodeIdsToSkip,
       });
       if (!childNode) {
         console.warn('Failed to rebuild', childN);
@@ -604,6 +708,13 @@ function rebuild(
     afterAppend?: (n: Node, id: number) => unknown;
     cache: BuildCache;
     mirror: Mirror;
+    /**
+     * Set of canvas node IDs that have pending mutations.
+     * For these canvases, skip drawing rr_dataURL during rebuild because
+     * a canvas mutation will update them to the correct state.
+     * Canvases NOT in this set will still draw their rr_dataURL.
+     */
+    canvasNodeIdsToSkip?: Set<number>;
   },
 ): Node | null {
   const {
@@ -614,6 +725,7 @@ function rebuild(
     afterAppend,
     cache,
     mirror = new Mirror(),
+    canvasNodeIdsToSkip,
   } = options;
   const node = buildNodeWithSN(n, {
     doc,
@@ -623,6 +735,7 @@ function rebuild(
     lazyLoadImages,
     afterAppend,
     cache,
+    canvasNodeIdsToSkip,
   });
   visit(mirror, (visitedNode) => {
     if (onVisit) {
