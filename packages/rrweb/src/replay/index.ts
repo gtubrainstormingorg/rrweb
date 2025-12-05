@@ -667,7 +667,11 @@ export class Replayer {
       // Structure: args[0] = { rr_type: 'ImageBitmap', args: [{ rr_type: 'Blob', data: [...], type: '...' }] }
       const imageBitmap = drawImageCmd.args[0] as {
         rr_type: string;
-        args: Array<{ rr_type: string; data: Array<{ base64: string }>; type: string }>;
+        args: Array<{
+          rr_type: string;
+          data: Array<{ base64: string }>;
+          type: string;
+        }>;
       };
       if (imageBitmap?.rr_type !== 'ImageBitmap') return undefined;
 
