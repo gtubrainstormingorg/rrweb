@@ -654,14 +654,14 @@ export class Replayer {
     // All intermediate mutations are wasted work that also causes visual delays.
     // Build a set of canvas mutation events to skip (all except the last per canvas).
     const canvasMutationsToSkip = new Set<eventWithTime>();
-    
+
     // Clear and repopulate the set of canvas nodes with pending mutations
     this.canvasNodeIdsWithPendingMutations.clear();
-    
+
     if (this.config.UNSAFE_replayCanvas) {
       // Find the last canvas mutation for each canvas node ID
       const lastCanvasMutationByNodeId = new Map<number, eventWithTime>();
-      
+
       for (const event of events) {
         if (
           event.type === EventType.IncrementalSnapshot &&
@@ -673,7 +673,7 @@ export class Replayer {
           this.canvasNodeIdsWithPendingMutations.add(nodeId);
         }
       }
-      
+
       // Mark all canvas mutations except the last one for each canvas as "skip"
       for (const event of events) {
         if (
@@ -688,13 +688,13 @@ export class Replayer {
         }
       }
     }
-    
+
     for (const event of events) {
       // Skip intermediate canvas mutations - only apply the last one per canvas
       if (canvasMutationsToSkip.has(event)) {
         continue;
       }
-      
+
       switch (event.type) {
         case EventType.DomContentLoaded:
         case EventType.Load:
@@ -900,7 +900,9 @@ export class Replayer {
       cache: this.cache,
       mirror: this.mirror,
       lazyLoadImages: this.config.lazyLoadImages,
-      canvasNodeIdsToSkip: isSync ? this.canvasNodeIdsWithPendingMutations : undefined,
+      canvasNodeIdsToSkip: isSync
+        ? this.canvasNodeIdsWithPendingMutations
+        : undefined,
     } as Parameters<typeof rebuild>[1]);
     afterAppend(this.iframe.contentDocument, event.data.node.id);
 
