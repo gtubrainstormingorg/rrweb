@@ -1,6 +1,6 @@
 {
   "name": "@howdygo/rrweb-types",
-  "version": "2.0.0-alpha.40",
+  "version": "2.0.0-alpha.41",
   "publishConfig": {
     "access": "public"
   },
@@ -50,7 +50,7 @@
     "vite-plugin-dts": "^3.9.1"
   },
   "dependencies": {
-    "@howdygo/rrweb-snapshot": "^2.0.0-alpha.40"
+    "@howdygo/rrweb-snapshot": "^2.0.0-alpha.41"
   },
   "browserslist": [
     "supports es6-class"
