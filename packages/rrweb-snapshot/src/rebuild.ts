@@ -95,7 +95,7 @@ export function preloadCanvasImage(dataURL: string): Promise<void> {
  */
 export function extractCanvasDataURLs(node: serializedNodeWithId): string[] {
   const dataURLs: string[] = [];
-  
+
   function walk(n: serializedNodeWithId) {
     if (n.type === NodeType.Element) {
       const el = n as serializedElementNodeWithId;
@@ -107,7 +107,7 @@ export function extractCanvasDataURLs(node: serializedNodeWithId): string[] {
       }
     }
   }
-  
+
   walk(node);
   return dataURLs;
 }
@@ -116,7 +116,9 @@ export function extractCanvasDataURLs(node: serializedNodeWithId): string[] {
  * Preload all canvas images from a serialized node tree.
  * Call this before replay to eliminate canvas flicker.
  */
-export function preloadAllCanvasImages(node: serializedNodeWithId): Promise<void[]> {
+export function preloadAllCanvasImages(
+  node: serializedNodeWithId,
+): Promise<void[]> {
   const dataURLs = extractCanvasDataURLs(node);
   return Promise.all(dataURLs.map(preloadCanvasImage));
 }
@@ -414,7 +416,7 @@ function buildNode(
             if (ctx) {
               const dataURL = value.toString();
               const image = getCachedCanvasImage(dataURL);
-              
+
               if (image.complete && image.naturalWidth > 0) {
                 // Image is already loaded (cached), draw immediately - no flicker!
                 ctx.drawImage(image, 0, 0, image.width, image.height);
@@ -564,7 +566,13 @@ export function buildNodeWithSN(
     // For safety concern, check if the node in mirror is the same as the node we are trying to build
     if (isNodeMetaEqual(meta, n)) return mirror.getNode(n.id);
   }
-  let node = buildNode(n, { doc, hackCss, cache, lazyLoadImages, canvasNodeIdsToSkip });
+  let node = buildNode(n, {
+    doc,
+    hackCss,
+    cache,
+    lazyLoadImages,
+    canvasNodeIdsToSkip,
+  });
   if (!node) {
     return null;
   }
