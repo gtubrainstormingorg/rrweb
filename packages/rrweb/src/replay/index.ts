@@ -645,9 +645,45 @@ export class Replayer {
     }
   };
 
-  // Track which canvas nodes have mutations during sync - used by rebuild to decide
-  // whether to draw the snapshot's rr_dataURL or skip it (because a mutation will update it)
-  private canvasNodeIdsWithPendingMutations: Set<number> = new Set();
+  // Store the final canvas image data URLs to apply during rebuild (prevents flicker)
+  private canvasFinalImages: Map<number, string> = new Map();
+
+  /**
+   * Extract the base64 image data URL from a canvas mutation's drawImage command.
+   * Returns undefined if no valid drawImage command is found.
+   */
+  private extractCanvasImageDataURL(
+    mutationData: canvasMutationData,
+  ): string | undefined {
+    if (!('commands' in mutationData)) return undefined;
+
+    // Find the drawImage command
+    const drawImageCmd = mutationData.commands.find(
+      (cmd) => cmd.property === 'drawImage',
+    );
+    if (!drawImageCmd) return undefined;
+
+    try {
+      // Structure: args[0] = { rr_type: 'ImageBitmap', args: [{ rr_type: 'Blob', data: [...], type: '...' }] }
+      const imageBitmap = drawImageCmd.args[0] as {
+        rr_type: string;
+        args: Array<{ rr_type: string; data: Array<{ base64: string }>; type: string }>;
+      };
+      if (imageBitmap?.rr_type !== 'ImageBitmap') return undefined;
+
+      const blob = imageBitmap.args[0];
+      if (blob?.rr_type !== 'Blob') return undefined;
+
+      const base64 = blob.data[0]?.base64;
+      const mimeType = blob.type || 'image/png';
+
+      if (!base64) return undefined;
+
+      return `data:${mimeType};base64,${base64}`;
+    } catch {
+      return undefined;
+    }
+  }
 
   private applyEventsSynchronously = (events: Array<eventWithTime>) => {
     // Optimization: When seeking, we only need the LAST canvas mutation for each canvas.
@@ -655,8 +691,8 @@ export class Replayer {
     // Build a set of canvas mutation events to skip (all except the last per canvas).
     const canvasMutationsToSkip = new Set<eventWithTime>();
 
-    // Clear and repopulate the set of canvas nodes with pending mutations
-    this.canvasNodeIdsWithPendingMutations.clear();
+    // Clear and repopulate the canvas final images map
+    this.canvasFinalImages.clear();
 
     if (this.config.UNSAFE_replayCanvas) {
       // Find the last canvas mutation for each canvas node ID
@@ -669,12 +705,13 @@ export class Replayer {
         ) {
           const nodeId = (event.data as canvasMutationData).id;
           lastCanvasMutationByNodeId.set(nodeId, event);
-          // Track that this canvas has mutations - used by rebuild
-          this.canvasNodeIdsWithPendingMutations.add(nodeId);
         }
       }
 
-      // Mark all canvas mutations except the last one for each canvas as "skip"
+      // Mark intermediate canvas mutations as "skip" and extract the final image data
+      // from the last mutation to apply during rebuild (prevents flicker).
+      // The last mutation is NOT skipped - it still needs to be applied for forward
+      // seeking/playback to work correctly when there's no full snapshot rebuild.
       for (const event of events) {
         if (
           event.type === EventType.IncrementalSnapshot &&
@@ -683,7 +720,17 @@ export class Replayer {
           const nodeId = (event.data as canvasMutationData).id;
           const lastMutation = lastCanvasMutationByNodeId.get(nodeId);
           if (event !== lastMutation) {
+            // Skip intermediate mutations
             canvasMutationsToSkip.add(event);
+          } else {
+            // This is the last mutation - extract the image data URL for rebuild
+            // but DON'T skip the mutation itself (needed for forward seeking)
+            const dataURL = this.extractCanvasImageDataURL(
+              event.data as canvasMutationData,
+            );
+            if (dataURL) {
+              this.canvasFinalImages.set(nodeId, dataURL);
+            }
           }
         }
       }
@@ -891,18 +938,16 @@ export class Replayer {
     }
 
     this.mirror.reset();
-    // When seeking (isSync=true), only skip drawing canvas rr_dataURL for canvases
-    // that have pending mutations. Those canvases will be updated by the mutations.
-    // Canvases WITHOUT mutations still need their rr_dataURL drawn.
+    // When seeking (isSync=true), apply the final canvas images directly during rebuild
+    // to prevent flicker. The canvasFinalImages map contains data URLs extracted from
+    // the last canvas mutation for each canvas, so we draw the final state immediately.
     rebuild(event.data.node, {
       doc: this.iframe.contentDocument,
       afterAppend,
       cache: this.cache,
       mirror: this.mirror,
       lazyLoadImages: this.config.lazyLoadImages,
-      canvasNodeIdsToSkip: isSync
-        ? this.canvasNodeIdsWithPendingMutations
-        : undefined,
+      canvasFinalImages: isSync ? this.canvasFinalImages : undefined,
     } as Parameters<typeof rebuild>[1]);
     afterAppend(this.iframe.contentDocument, event.data.node.id);
 

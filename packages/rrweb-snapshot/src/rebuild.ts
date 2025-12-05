@@ -229,15 +229,15 @@ function buildNode(
     cache: BuildCache;
     lazyLoadImages?: boolean;
     /**
-     * Set of canvas node IDs that have pending mutations.
-     * For these canvases, skip drawing rr_dataURL during rebuild because
-     * a canvas mutation will update them to the correct state.
-     * Canvases NOT in this set will still draw their rr_dataURL.
+     * Map of canvas node IDs to their final image data URLs.
+     * When seeking, this contains the image from the last canvas mutation,
+     * so we can draw the final state immediately instead of the snapshot's rr_dataURL.
+     * This prevents flicker by showing the correct state from the start.
      */
-    canvasNodeIdsToSkip?: Set<number>;
+    canvasFinalImages?: Map<number, string>;
   },
 ): Node | null {
-  const { doc, hackCss, cache, lazyLoadImages, canvasNodeIdsToSkip } = options;
+  const { doc, hackCss, cache, lazyLoadImages, canvasFinalImages } = options;
   switch (n.type) {
     case NodeType.Document:
       return doc.implementation.createDocument(null, '', null);
@@ -403,19 +403,19 @@ function buildNode(
           // If the canvas element is created in RRDom runtime (seeking to a time point), the canvas context isn't supported. So the data has to be stored and not handled until diff process. https://github.com/rrweb-io/rrweb/pull/944
           if ((node as unknown as RRCanvasElement).RRNodeType) {
             (node as unknown as RRCanvasElement).rr_dataURL = value.toString();
-          } else if (canvasNodeIdsToSkip?.has(n.id)) {
-            // This canvas has pending mutations that will update it to the correct state.
-            // Skip drawing the full snapshot's canvas image to avoid flicker from showing
-            // the old snapshot state briefly before the mutation applies.
-            // Still preload the image for cache so it's ready if needed later.
-            getCachedCanvasImage(value.toString());
           } else {
             // For real DOM canvas, use cached image to avoid flicker when seeking
             const canvas = node as HTMLCanvasElement;
             const ctx = canvas.getContext('2d');
             if (ctx) {
-              const dataURL = value.toString();
+              // Use the final image from canvas mutations if available (prevents flicker),
+              // otherwise fall back to the snapshot's rr_dataURL
+              const finalImageDataURL = canvasFinalImages?.get(n.id);
+              const dataURL = finalImageDataURL || value.toString();
               const image = getCachedCanvasImage(dataURL);
+
+              // Set globalCompositeOperation to 'copy' to completely replace canvas content
+              ctx.globalCompositeOperation = 'copy';
 
               if (image.complete && image.naturalWidth > 0) {
                 // Image is already loaded (cached), draw immediately - no flicker!
@@ -535,12 +535,11 @@ export function buildNodeWithSN(
     afterAppend?: (n: Node, id: number) => unknown;
     cache: BuildCache;
     /**
-     * Set of canvas node IDs that have pending mutations.
-     * For these canvases, skip drawing rr_dataURL during rebuild because
-     * a canvas mutation will update them to the correct state.
-     * Canvases NOT in this set will still draw their rr_dataURL.
+     * Map of canvas node IDs to their final image data URLs.
+     * When seeking, this contains the image from the last canvas mutation,
+     * so we can draw the final state immediately instead of the snapshot's rr_dataURL.
      */
-    canvasNodeIdsToSkip?: Set<number>;
+    canvasFinalImages?: Map<number, string>;
   },
 ): Node | null {
   const {
@@ -551,7 +550,7 @@ export function buildNodeWithSN(
     lazyLoadImages = false,
     afterAppend,
     cache,
-    canvasNodeIdsToSkip,
+    canvasFinalImages,
   } = options;
   /**
    * Add a check to see if the node is already in the mirror. If it is, we can skip the whole process.
@@ -571,7 +570,7 @@ export function buildNodeWithSN(
     hackCss,
     cache,
     lazyLoadImages,
-    canvasNodeIdsToSkip,
+    canvasFinalImages,
   });
   if (!node) {
     return null;
@@ -625,7 +624,7 @@ export function buildNodeWithSN(
         lazyLoadImages,
         afterAppend,
         cache,
-        canvasNodeIdsToSkip,
+        canvasFinalImages,
       });
       if (!childNode) {
         console.warn('Failed to rebuild', childN);
@@ -717,12 +716,11 @@ function rebuild(
     cache: BuildCache;
     mirror: Mirror;
     /**
-     * Set of canvas node IDs that have pending mutations.
-     * For these canvases, skip drawing rr_dataURL during rebuild because
-     * a canvas mutation will update them to the correct state.
-     * Canvases NOT in this set will still draw their rr_dataURL.
+     * Map of canvas node IDs to their final image data URLs.
+     * When seeking, this contains the image from the last canvas mutation,
+     * so we can draw the final state immediately instead of the snapshot's rr_dataURL.
      */
-    canvasNodeIdsToSkip?: Set<number>;
+    canvasFinalImages?: Map<number, string>;
   },
 ): Node | null {
   const {
@@ -733,7 +731,7 @@ function rebuild(
     afterAppend,
     cache,
     mirror = new Mirror(),
-    canvasNodeIdsToSkip,
+    canvasFinalImages,
   } = options;
   const node = buildNodeWithSN(n, {
     doc,
@@ -743,7 +741,7 @@ function rebuild(
     lazyLoadImages,
     afterAppend,
     cache,
-    canvasNodeIdsToSkip,
+    canvasFinalImages,
   });
   visit(mirror, (visitedNode) => {
     if (onVisit) {
