@@ -22,10 +22,7 @@ function optimizeMutations(
     const next = mutations[i + 1];
 
     // Check for clearRect followed by drawImage pattern
-    if (
-      current.property === 'clearRect' &&
-      next?.property === 'drawImage'
-    ) {
+    if (current.property === 'clearRect' && next?.property === 'drawImage') {
       // Replace clearRect with globalCompositeOperation = 'copy'
       optimized.push({
         property: 'globalCompositeOperation',
