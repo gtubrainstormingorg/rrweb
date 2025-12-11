@@ -1,6 +1,6 @@
 {
   "name": "@howdygo/rrweb-all",
-  "version": "2.0.0-alpha.41",
+  "version": "2.0.0-alpha.42",
   "publishConfig": {
     "access": "private"
   },
@@ -56,9 +56,9 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@howdygo/rrweb-types": "^2.0.0-alpha.41",
-    "@howdygo/rrweb-packer": "^2.0.0-alpha.41",
-    "@howdygo/rrweb": "^2.0.0-alpha.41"
+    "@howdygo/rrweb-types": "^2.0.0-alpha.42",
+    "@howdygo/rrweb-packer": "^2.0.0-alpha.42",
+    "@howdygo/rrweb": "^2.0.0-alpha.42"
   },
   "browserslist": [
     "supports es6-class"
