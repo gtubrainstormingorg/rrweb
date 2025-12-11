@@ -10,6 +10,7 @@ import {
   type attributes,
   type serializedElementNodeWithId,
   toLowerCase,
+  preloadCanvasImage,
 } from '@howdygo/rrweb-snapshot';
 import {
   RRDocument,
@@ -427,6 +428,34 @@ export class Replayer {
     if (this.service.state.context.events.find(indicatesTouchDevice)) {
       this.mouse.classList.add('touch-device');
     }
+
+    // Preload all canvas mutation images upfront to prevent flicker when seeking
+    if (this.config.UNSAFE_replayCanvas) {
+      this.preloadAllCanvasMutationImages();
+    }
+  }
+
+  /**
+   * Preload all canvas mutation images from all events.
+   * This ensures images are cached before any seek operation,
+   * preventing flicker on the first backward seek.
+   */
+  private preloadAllCanvasMutationImages() {
+    const events = this.service.state.context.events;
+    for (const event of events) {
+      if (
+        event.type === EventType.IncrementalSnapshot &&
+        event.data.source === IncrementalSource.CanvasMutation
+      ) {
+        const dataURL = this.extractCanvasImageDataURL(
+          event.data as canvasMutationData,
+        );
+        if (dataURL) {
+          // Start preloading - don't await, just fire and forget
+          void preloadCanvasImage(dataURL);
+        }
+      }
+    }
   }
 
   public on(event: string, handler: Handler) {
@@ -730,6 +759,9 @@ export class Replayer {
             );
             if (dataURL) {
               this.canvasFinalImages.set(nodeId, dataURL);
+              // Preload the image into cache immediately so it's ready during rebuild
+              // This prevents the white flash when seeking backward
+              void preloadCanvasImage(dataURL);
             }
           }
         }
