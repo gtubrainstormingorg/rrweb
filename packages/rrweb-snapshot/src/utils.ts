@@ -508,13 +508,10 @@ export function markCssSplits(
 export function removeCommentsFromCss(cssString: string): string {
   // Protect url() content by temporarily replacing them
   const urlPlaceholders: string[] = [];
-  const protectedCss = cssString.replace(
-    /url\((['"]?)(.*?)\1\)/g,
-    (match) => {
-      urlPlaceholders.push(match);
-      return `__URL_PLACEHOLDER_${urlPlaceholders.length - 1}__`;
-    },
-  );
+  const protectedCss = cssString.replace(/url\((['"]?)(.*?)\1\)/g, (match) => {
+    urlPlaceholders.push(match);
+    return `__URL_PLACEHOLDER_${urlPlaceholders.length - 1}__`;
+  });
 
   // Remove comments safely without interfering with url() content
   const cssWithoutComments = protectedCss.replace(/\/\*[\s\S]*?\*\//g, '');
@@ -717,9 +714,7 @@ export async function processCssText(
     if (inlineCss !== undefined) {
       // For .css URLs inside @import, inline the CSS content
       const escapedMatch = match.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const importPattern = new RegExp(
-        `@import\\s*${escapedMatch}\\s*;?`,
-      );
+      const importPattern = new RegExp(`@import\\s*${escapedMatch}\\s*;?`);
       if (importPattern.test(cssText)) {
         cssText = cssText.replace(importPattern, inlineCss);
       } else if (newUrl) {
