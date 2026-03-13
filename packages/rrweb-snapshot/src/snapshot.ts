@@ -28,6 +28,9 @@ import {
   extractFileExtension,
   absolutifyURLs,
   markCssSplits,
+  removeCommentsFromCss,
+  fixLinearGradients,
+  processCssText,
 } from './utils';
 import dom from '@howdygo/rrweb-utils';
 
@@ -588,18 +591,19 @@ function serializeElementNode(
   }
   // remote css
   if (tagName === 'link' && inlineStylesheet) {
-    //TODO: maybe replace this `.styleSheets` with original one
-    const stylesheet = Array.from(doc.styleSheets).find((s) => {
-      return s.href === (n as HTMLLinkElement).href;
-    });
-    let cssText: string | null = null;
-    if (stylesheet) {
-      cssText = stringifyStylesheet(stylesheet);
-    }
-    if (cssText) {
-      delete attributes.rel;
-      delete attributes.href;
-      attributes._cssText = cssText;
+    const linkHref = (n as HTMLLinkElement).href;
+    if (linkHref && !linkHref.startsWith('data:')) {
+      fetch(linkHref)
+        .then((response) => response.text())
+        .then((cssText) => processCssText(cssText, linkHref))
+        .then((processedCss) => {
+          attributes._cssText = processedCss;
+        })
+        .catch((err) => {
+          console.warn(
+            `Cannot inline stylesheet href=${linkHref}! Error: ${err}`,
+          );
+        });
     }
   }
   if (tagName === 'style' && (n as HTMLStyleElement).sheet) {
@@ -607,10 +611,25 @@ function serializeElementNode(
       (n as HTMLStyleElement).sheet as CSSStyleSheet,
     );
     if (cssText) {
-      if (n.childNodes.length > 1) {
-        cssText = markCssSplits(cssText, n as HTMLStyleElement);
+      const needsSplitMarkers = n.childNodes.length > 1;
+      // Set initial _cssText synchronously with basic processing
+      let initialCss = removeCommentsFromCss(cssText);
+      initialCss = fixLinearGradients(initialCss);
+      if (needsSplitMarkers) {
+        initialCss = markCssSplits(initialCss, n as HTMLStyleElement);
       }
-      attributes._cssText = cssText;
+      attributes._cssText = initialCss;
+      // Fire-and-forget: process @imports and absolutify URLs
+      const baseUrl = doc.baseURI || doc.location?.href || '';
+      processCssText(cssText, baseUrl)
+        .then((processedCss) => {
+          attributes._cssText = needsSplitMarkers
+            ? markCssSplits(processedCss, n as HTMLStyleElement)
+            : processedCss;
+        })
+        .catch(() => {
+          // Keep the synchronously-set _cssText on failure
+        });
     }
   }
   // form fields

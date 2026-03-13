@@ -501,3 +501,249 @@ export function markCssSplits(
 ): string {
   return splitCssText(cssText, style).join('/* rr_split */');
 }
+
+/**
+ * Remove CSS comments while protecting url() content from being corrupted.
+ */
+export function removeCommentsFromCss(cssString: string): string {
+  // Protect url() content by temporarily replacing them
+  const urlPlaceholders: string[] = [];
+  const protectedCss = cssString.replace(
+    /url\((['"]?)(.*?)\1\)/g,
+    (match) => {
+      urlPlaceholders.push(match);
+      return `__URL_PLACEHOLDER_${urlPlaceholders.length - 1}__`;
+    },
+  );
+
+  // Remove comments safely without interfering with url() content
+  const cssWithoutComments = protectedCss.replace(/\/\*[\s\S]*?\*\//g, '');
+
+  // Restore the protected url() content
+  const restoredCss = cssWithoutComments.replace(
+    /__URL_PLACEHOLDER_(\d+)__/g,
+    (_, index) => urlPlaceholders[Number(index)],
+  );
+
+  return restoredCss;
+}
+
+/**
+ * Fix malformed linear-gradient syntax that uses `text` instead of
+ * the correct `-webkit-background-clip: text` declaration.
+ */
+export function fixLinearGradients(cssString: string): string {
+  return cssString.replace(
+    /linear-gradient\(([^;]+?)\)\s+text;/g,
+    'linear-gradient($1); -webkit-background-clip: text;',
+  );
+}
+
+/**
+ * Get unique URL matches from CSS url() patterns.
+ * Matches url(...) with support for nested brackets, quoted and unquoted URLs.
+ */
+export function getMatchesFromCss(cssString: string) {
+  const matches = [
+    ...cssString.matchAll(
+      /(?<!@namespace[^;]*)(url\(['"]?)(?:[^)(]|\((?:[^)(]|\((?:[^)(]|\([^)(]*\))*\))*\))*?(['"]?\))/g,
+    ),
+  ];
+
+  const results = matches
+    .map((match) => ({
+      match: match[0],
+      prefix: match[1],
+      postfix: match[2],
+      url: match[0].slice(match[1].length, -match[2].length),
+    }))
+    .map((result) => {
+      // Remove double Empiraa urls
+      const urls = [...result.url.matchAll(/(\shttps?:\/\/[^\s]+)/g)];
+      if (urls && urls[urls.length - 1] && urls[urls.length - 1][0]) {
+        result.url = urls[urls.length - 1][0].slice(1);
+      }
+      return result;
+    })
+    .map((result) => {
+      // Remove whitespace from start and end of urls
+      result.url = result.url.trim();
+      return result;
+    })
+    // Filter out local SVG gradients and other url references starting with #
+    .filter((result) => !result.url.startsWith('#'));
+
+  // Reduce to uniqueResults only
+  const uniqueResults = [
+    ...results
+      .reduce((map, { match, prefix, postfix, url }) => {
+        return map.set(`${match}-${prefix}-${postfix}-${url}`, {
+          match,
+          prefix,
+          postfix,
+          url,
+        });
+      }, new Map<string, { match: string; prefix: string; postfix: string; url: string }>())
+      .values(),
+  ];
+
+  // Reduce to set of unique urls with length greater than 0
+  const uniqueUrls = [
+    ...new Set(
+      uniqueResults.map((result) => result.url).filter((u) => u.length > 0),
+    ),
+  ];
+
+  return { uniqueResults, uniqueUrls };
+}
+
+/**
+ * Extract URLs from an image-set() argument string.
+ */
+export function extractUrlsFromImageSetString(
+  imageSetString: string,
+): string[] {
+  const matches = [
+    ...imageSetString.matchAll(
+      /(?<!\()\s*(['"])([^'"\s,)]+)\1(?:\s+[0-9.]+[xw])?(?:\s+type\([^)]*\))?/g,
+    ),
+  ];
+  return matches.map((match) => match[2]);
+}
+
+/**
+ * Get image-set() matches from CSS, extracting the URLs within each.
+ */
+export function getMatchesFromImageSet(cssString: string) {
+  const matches = [
+    ...cssString.matchAll(
+      /(?:-webkit-)?image-set\(\s*((?:[^()]+|\([^()]*\))*)\s*\)/g,
+    ),
+  ];
+  return matches
+    .map((match) => ({
+      match: match[0],
+      urls: extractUrlsFromImageSetString(match[1]),
+    }))
+    .filter((m) => m.urls.length > 0);
+}
+
+/**
+ * Resolve a (potentially relative) URL against a base URL.
+ */
+export function resolveUrl(url: string, baseUrl: string): string {
+  if (!url || url.startsWith('data:') || url.startsWith('#')) {
+    return url;
+  }
+  if (URL_PROTOCOL_MATCH.test(url) || URL_WWW_MATCH.test(url)) {
+    return url;
+  }
+  if (url[0] === '/') {
+    return extractOrigin(baseUrl) + url;
+  }
+  const stack = baseUrl.split('/');
+  const parts = url.split('/');
+  stack.pop();
+  for (const part of parts) {
+    if (part === '.') {
+      continue;
+    } else if (part === '..') {
+      stack.pop();
+    } else {
+      stack.push(part);
+    }
+  }
+  return stack.join('/');
+}
+
+/**
+ * Process CSS text by removing comments, fixing gradients, resolving @import
+ * url() references by fetching and inlining the imported CSS recursively,
+ * and absolutifying all remaining asset URLs.
+ *
+ * This matches the processing pipeline used by the extension's
+ * _cacheCssAssetsAndUpdateUrls function.
+ */
+export async function processCssText(
+  cssText: string,
+  baseUrl: string,
+): Promise<string> {
+  cssText = removeCommentsFromCss(cssText);
+  cssText = fixLinearGradients(cssText);
+
+  // Get image sets and regular CSS URLs
+  const imageSets = getMatchesFromImageSet(cssText);
+  const { uniqueUrls, uniqueResults } = getMatchesFromCss(cssText);
+
+  // Extract all URLs (both from image sets and regular URLs)
+  const allUrls = [
+    ...uniqueUrls,
+    ...imageSets.flatMap((imageSet) => imageSet.urls),
+  ];
+
+  // Get all replacements in parallel
+  const replacements = await Promise.all(
+    allUrls.map(async (url) => {
+      if (url.match(/\.css(\?.*)?$/i)) {
+        // If .css extension then fetch and process recursively
+        const srcUrl = resolveUrl(url, baseUrl);
+        try {
+          const cssFile = await fetch(srcUrl).then((res) => res.text());
+          // Recursively process the CSS to handle nested @imports and URLs
+          const processedCss = await processCssText(cssFile, srcUrl);
+          return { originalUrl: url, newUrl: srcUrl, inlineCss: processedCss };
+        } catch {
+          // On failure, just absolutify the URL
+          return { originalUrl: url, newUrl: srcUrl };
+        }
+      } else {
+        // For other assets, absolutify the URL
+        const resolvedUrl = resolveUrl(url, baseUrl);
+        return { originalUrl: url, newUrl: resolvedUrl };
+      }
+    }),
+  );
+
+  // Handle replacements for regular URLs
+  for (const result of uniqueResults) {
+    const { prefix, postfix, match, url } = result;
+    const replacement = replacements.find((r) => r.originalUrl === url);
+    if (!replacement) continue;
+
+    const { newUrl } = replacement;
+    const inlineCss =
+      'inlineCss' in replacement ? replacement.inlineCss : undefined;
+
+    if (inlineCss !== undefined) {
+      // For .css URLs inside @import, inline the CSS content
+      const escapedMatch = match.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const importPattern = new RegExp(
+        `@import\\s*${escapedMatch}\\s*;?`,
+      );
+      if (importPattern.test(cssText)) {
+        cssText = cssText.replace(importPattern, inlineCss);
+      } else if (newUrl) {
+        // Not an @import, just absolutify
+        cssText = cssText.replaceAll(match, `${prefix}${newUrl}${postfix}`);
+      }
+    } else if (newUrl) {
+      cssText = cssText.replaceAll(match, `${prefix}${newUrl}${postfix}`);
+    }
+  }
+
+  // Handle replacements for image set URLs
+  for (const { match, urls } of imageSets) {
+    let newImageSet = match;
+    for (const originalUrl of urls) {
+      const replacement = replacements.find(
+        (r) => r.originalUrl === originalUrl,
+      );
+      if (replacement && replacement.newUrl) {
+        newImageSet = newImageSet.replace(originalUrl, replacement.newUrl);
+      }
+    }
+    cssText = cssText.replace(match, newImageSet);
+  }
+
+  return cssText;
+}
