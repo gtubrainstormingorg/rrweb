@@ -1,8 +1,8 @@
 {
   "name": "@howdygo/rrweb-player",
-  "version": "2.0.0-alpha.42",
+  "version": "2.0.0-alpha.44",
   "devDependencies": {
-    "@howdygo/rrweb-types": "^2.0.0-alpha.42",
+    "@howdygo/rrweb-types": "^2.0.0-alpha.44",
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/package": "^2.0.0",
@@ -20,8 +20,8 @@
   },
   "dependencies": {
     "@tsconfig/svelte": "^1.0.0",
-    "@howdygo/rrweb-replay": "^2.0.0-alpha.42",
-    "@howdygo/rrweb-packer": "^2.0.0-alpha.42"
+    "@howdygo/rrweb-replay": "^2.0.0-alpha.44",
+    "@howdygo/rrweb-packer": "^2.0.0-alpha.44"
   },
   "scripts": {
     "dev": "vite build --watch",
