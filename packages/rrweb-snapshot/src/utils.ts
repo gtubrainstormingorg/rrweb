@@ -547,9 +547,7 @@ export function inlineBlobUrls(
         reader.readAsDataURL(blob);
       })
       .catch((err) => {
-        console.warn(
-          `Cannot inline blob URL in style: ${url}. Error: ${err}`,
-        );
+        console.warn(`Cannot inline blob URL in style: ${url}. Error: ${err}`);
       });
   }
 }

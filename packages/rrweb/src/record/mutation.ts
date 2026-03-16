@@ -644,11 +644,7 @@ export default class MutationBuffer {
               typeof item.attributes.style === 'string' &&
               item.attributes.style.includes('blob:')
             ) {
-              inlineBlobUrls(
-                item.attributes.style,
-                item.attributes,
-                'style',
-              );
+              inlineBlobUrls(item.attributes.style, item.attributes, 'style');
             }
             if (!this.unattachedDoc) {
               try {
