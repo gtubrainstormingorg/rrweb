@@ -418,7 +418,7 @@ export function absolutifyURLs(cssText: string | null, href: string): string {
       if (URL_PROTOCOL_MATCH.test(filePath) || URL_WWW_MATCH.test(filePath)) {
         return `url(${maybeQuote}${filePath}${maybeQuote})`;
       }
-      if (DATA_URI.test(filePath)) {
+      if (DATA_URI.test(filePath) || filePath.startsWith('blob:')) {
         return `url(${maybeQuote}${filePath}${maybeQuote})`;
       }
       if (filePath[0] === '/') {
@@ -500,4 +500,56 @@ export function markCssSplits(
   style: HTMLStyleElement,
 ): string {
   return splitCssText(cssText, style).join('/* rr_split */');
+}
+
+/**
+ * Finds blob: URLs inside CSS url() references and asynchronously replaces
+ * them with base64 data URIs by fetching the blob content.
+ * Mutates the `target` object at `key` as each blob resolves.
+ * Handles both plain string values and [value, priority] tuple values
+ * (as used by rrweb's compact style diff format).
+ */
+export function inlineBlobUrls(
+  styleValue: string,
+  target: Record<string, unknown>,
+  key: string,
+) {
+  const blobUrls: Array<{ url: string }> = [];
+  let match;
+  URL_IN_CSS_REF.lastIndex = 0;
+  while ((match = URL_IN_CSS_REF.exec(styleValue)) !== null) {
+    const url = match[2] || match[4] || match[5];
+    if (url && url.startsWith('blob:')) {
+      blobUrls.push({ url });
+    }
+  }
+  if (blobUrls.length === 0) return;
+
+  for (const { url } of blobUrls) {
+    fetch(url)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const dataURL = reader.result as string;
+          const existing = target[key];
+          if (Array.isArray(existing)) {
+            target[key] = [
+              (existing[0] as string).replace(url, dataURL),
+              existing[1],
+            ];
+          } else {
+            const current =
+              typeof existing === 'string' ? existing : styleValue;
+            target[key] = current.replace(url, dataURL);
+          }
+        };
+        reader.readAsDataURL(blob);
+      })
+      .catch((err) => {
+        console.warn(
+          `Cannot inline blob URL in style: ${url}. Error: ${err}`,
+        );
+      });
+  }
 }

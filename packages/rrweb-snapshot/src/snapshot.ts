@@ -28,6 +28,7 @@ import {
   extractFileExtension,
   absolutifyURLs,
   markCssSplits,
+  inlineBlobUrls,
 } from './utils';
 import dom from '@howdygo/rrweb-utils';
 
@@ -781,6 +782,14 @@ function serializeElementNode(
       // Wait until the video data is fully loaded
       video.addEventListener('loadeddata', recordInlineVideo);
     }
+  }
+  // inline blob URLs in style attributes (e.g. background-image: url("blob:..."))
+  if (
+    inlineImages &&
+    typeof attributes.style === 'string' &&
+    attributes.style.includes('blob:')
+  ) {
+    inlineBlobUrls(attributes.style, attributes, 'style');
   }
   // media elements
   if (tagName === 'audio' || tagName === 'video') {

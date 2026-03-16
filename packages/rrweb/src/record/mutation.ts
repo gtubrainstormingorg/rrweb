@@ -10,6 +10,7 @@ import {
   isNativeShadowDom,
   getInputType,
   toLowerCase,
+  inlineBlobUrls,
 } from '@howdygo/rrweb-snapshot';
 import type { observerParam, MutationBufferParam } from '../types';
 import type {
@@ -638,6 +639,17 @@ export default class MutationBuffer {
             value,
           );
           if (attributeName === 'style') {
+            if (
+              this.inlineImages &&
+              typeof item.attributes.style === 'string' &&
+              item.attributes.style.includes('blob:')
+            ) {
+              inlineBlobUrls(
+                item.attributes.style,
+                item.attributes,
+                'style',
+              );
+            }
             if (!this.unattachedDoc) {
               try {
                 // avoid upsetting original document from a Content Security point of view
@@ -663,6 +675,9 @@ export default class MutationBuffer {
                   item.styleDiff[pname] = newValue;
                 } else {
                   item.styleDiff[pname] = [newValue, newPriority];
+                }
+                if (this.inlineImages && newValue.includes('blob:')) {
+                  inlineBlobUrls(newValue, item.styleDiff, pname);
                 }
               } else {
                 // for checking
