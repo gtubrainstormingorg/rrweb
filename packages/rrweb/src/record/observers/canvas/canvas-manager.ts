@@ -236,58 +236,67 @@ export class CanvasManager {
 
           this.snapshotInProgressMap.set(id, true);
 
-          const blob: Blob = await new Promise((resolve) =>
-            canvas.toBlob(
-              (file) => resolve(file!),
-              options.dataURLOptions.type,
-              options.dataURLOptions.quality,
-            ),
-          );
-          const type = blob.type;
-          const arrayBuffer = await blob.arrayBuffer();
-          const base64 = encode(arrayBuffer); // cpu intensive // TODO in post processing
+          try {
+            const blob: Blob | null = await new Promise((resolve) =>
+              canvas.toBlob(
+                (file) => resolve(file),
+                options.dataURLOptions.type,
+                options.dataURLOptions.quality,
+              ),
+            );
+            // Tainted canvases (e.g. cross-origin without CORS) yield a null
+            // blob — skip this frame so the canvas stays eligible for future
+            // capture if it later becomes untainted.
+            if (!blob) return;
+            const type = blob.type;
+            const arrayBuffer = await blob.arrayBuffer();
+            const base64 = encode(arrayBuffer); // cpu intensive // TODO in post processing
 
-          this.snapshotInProgressMap.set(id, false);
-          if (
-            !lastBlobMap.has(id) &&
-            (await getTransparentBlobFor(
-              canvas.width,
-              canvas.height,
-              options.dataURLOptions,
-            )) === base64
-          ) {
-            lastBlobMap.set(id, base64);
-          }
-          if (lastBlobMap.get(id) !== base64) {
-            this.mutationCb({
-              id,
-              type: CanvasContext['2D'],
-              commands: [
-                // TODO this can potentially get removed
-                {
-                  property: 'clearRect', // wipe canvas
-                  args: [0, 0, canvas.width, canvas.height],
-                },
-                {
-                  property: 'drawImage', // draws (semi-transparent) image
-                  args: [
-                    {
-                      rr_type: 'ImageBitmap',
-                      args: [
-                        {
-                          rr_type: 'Blob',
-                          data: [{ rr_type: 'ArrayBuffer', base64 }],
-                          type,
-                        },
-                      ],
-                    } as CanvasArg,
-                    0,
-                    0,
-                  ],
-                },
-              ],
-            });
-            lastBlobMap.set(id, base64);
+            if (
+              !lastBlobMap.has(id) &&
+              (await getTransparentBlobFor(
+                canvas.width,
+                canvas.height,
+                options.dataURLOptions,
+              )) === base64
+            ) {
+              lastBlobMap.set(id, base64);
+            }
+            if (lastBlobMap.get(id) !== base64) {
+              this.mutationCb({
+                id,
+                type: CanvasContext['2D'],
+                commands: [
+                  // TODO this can potentially get removed
+                  {
+                    property: 'clearRect', // wipe canvas
+                    args: [0, 0, canvas.width, canvas.height],
+                  },
+                  {
+                    property: 'drawImage', // draws (semi-transparent) image
+                    args: [
+                      {
+                        rr_type: 'ImageBitmap',
+                        args: [
+                          {
+                            rr_type: 'Blob',
+                            data: [{ rr_type: 'ArrayBuffer', base64 }],
+                            type,
+                          },
+                        ],
+                      } as CanvasArg,
+                      0,
+                      0,
+                    ],
+                  },
+                ],
+              });
+              lastBlobMap.set(id, base64);
+            }
+          } catch {
+            // tainted or errored canvas — skip this frame
+          } finally {
+            this.snapshotInProgressMap.set(id, false);
           }
         });
       rafId = requestAnimationFrame(takeCanvasSnapshots);
