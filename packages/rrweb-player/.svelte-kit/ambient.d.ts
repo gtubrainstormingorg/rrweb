@@ -31,6 +31,7 @@ declare module '$env/static/private' {
 	export const COREPACK_ROOT: string;
 	export const npm_package_scripts_test_cross_platform_build: string;
 	export const TERM_PROGRAM: string;
+	export const VSCODE_GIT_IPC_AUTH_TOKEN: string;
 	export const npm_package_exports___vite_import: string;
 	export const npm_package_exports___hooks_import: string;
 	export const NODE: string;
@@ -52,10 +53,9 @@ declare module '$env/static/private' {
 	export const npm_config_email: string;
 	export const TERM_PROGRAM_VERSION: string;
 	export const npm_package_dependencies_set_cookie_parser: string;
+	export const FPATH: string;
 	export const npm_package_dependencies_cookie: string;
 	export const MallocNanoZone: string;
-	export const ORIGINAL_XDG_CURRENT_DESKTOP: string;
-	export const CURSOR_TRACE_ID: string;
 	export const ZDOTDIR: string;
 	export const SDKMAN_PLATFORM: string;
 	export const npm_package_devDependencies_svelte_preprocess: string;
@@ -139,6 +139,7 @@ declare module '$env/static/private' {
 	export const npm_config_strict_ssl: string;
 	export const HOMEBREW_PREFIX: string;
 	export const npm_config_version_git_message: string;
+	export const GK_GL_ADDR: string;
 	export const LOGNAME: string;
 	export const LESS: string;
 	export const npm_package_scripts_format: string;
@@ -149,6 +150,7 @@ declare module '$env/static/private' {
 	export const npm_package_peerDependencies_svelte: string;
 	export const VSCODE_GIT_IPC_HANDLE: string;
 	export const npm_config_ignore_path: string;
+	export const GK_GL_PATH: string;
 	export const npm_package_devDependencies__types_set_cookie_parser: string;
 	export const NVM_BIN: string;
 	export const BUN_INSTALL: string;
@@ -219,6 +221,7 @@ declare module '$env/dynamic/private' {
 		COREPACK_ROOT: string;
 		npm_package_scripts_test_cross_platform_build: string;
 		TERM_PROGRAM: string;
+		VSCODE_GIT_IPC_AUTH_TOKEN: string;
 		npm_package_exports___vite_import: string;
 		npm_package_exports___hooks_import: string;
 		NODE: string;
@@ -240,10 +243,9 @@ declare module '$env/dynamic/private' {
 		npm_config_email: string;
 		TERM_PROGRAM_VERSION: string;
 		npm_package_dependencies_set_cookie_parser: string;
+		FPATH: string;
 		npm_package_dependencies_cookie: string;
 		MallocNanoZone: string;
-		ORIGINAL_XDG_CURRENT_DESKTOP: string;
-		CURSOR_TRACE_ID: string;
 		ZDOTDIR: string;
 		SDKMAN_PLATFORM: string;
 		npm_package_devDependencies_svelte_preprocess: string;
@@ -327,6 +329,7 @@ declare module '$env/dynamic/private' {
 		npm_config_strict_ssl: string;
 		HOMEBREW_PREFIX: string;
 		npm_config_version_git_message: string;
+		GK_GL_ADDR: string;
 		LOGNAME: string;
 		LESS: string;
 		npm_package_scripts_format: string;
@@ -337,6 +340,7 @@ declare module '$env/dynamic/private' {
 		npm_package_peerDependencies_svelte: string;
 		VSCODE_GIT_IPC_HANDLE: string;
 		npm_config_ignore_path: string;
+		GK_GL_PATH: string;
 		npm_package_devDependencies__types_set_cookie_parser: string;
 		NVM_BIN: string;
 		BUN_INSTALL: string;
