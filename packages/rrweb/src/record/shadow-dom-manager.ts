@@ -51,7 +51,24 @@ export class ShadowDomManager {
 
   public addShadowRoot(shadowRoot: ShadowRoot, doc: Document) {
     if (!isNativeShadowDom(shadowRoot)) return;
-    if (this.shadowDoms.has(shadowRoot)) return;
+    if (this.shadowDoms.has(shadowRoot)) {
+      // Shadow root was registered earlier. This call originates from
+      // mutation onSerialize, which fires while the mutation is still being
+      // built — the mutation event hasn't been emitted yet. Deferring via
+      // setTimeout(0) ensures the AdoptedStyleSheet event lands AFTER the
+      // mutation event in the stream. Otherwise, when the move/re-add
+      // mutation is applied on replay, it would destroy the prior shadow
+      // root (along with its adopted stylesheets) AFTER the AdoptedStyleSheet
+      // event already applied — leaving the new shadow root empty.
+      //
+      // Frameworks like Stencil (Ionic) set adoptedStyleSheets synchronously
+      // inside connectedCallback before the host is mirrored, and Ionic
+      // reparents ion-modal elements between locations during open/close —
+      // each move triggers a remove+add mutation that wipes the host's
+      // shadow root on replay. See HWG-844.
+      setTimeout(() => this.captureAdoptedStyleSheets(shadowRoot), 0);
+      return;
+    }
     this.shadowDoms.add(shadowRoot);
     this.bypassOptions.canvasManager.addShadowRoot(shadowRoot);
     const observer = initMutationObserver(
@@ -77,14 +94,7 @@ export class ShadowDomManager {
     );
     // Defer this to avoid adoptedStyleSheet events being created before the full snapshot is created or attachShadow action is recorded.
     setTimeout(() => {
-      if (
-        shadowRoot.adoptedStyleSheets &&
-        shadowRoot.adoptedStyleSheets.length > 0
-      )
-        this.bypassOptions.stylesheetManager.adoptStyleSheets(
-          shadowRoot.adoptedStyleSheets,
-          this.mirror.getId(dom.host(shadowRoot)),
-        );
+      this.captureAdoptedStyleSheets(shadowRoot);
       this.restoreHandlers.push(
         initAdoptedStyleSheetObserver(
           {
@@ -95,6 +105,20 @@ export class ShadowDomManager {
         ),
       );
     }, 0);
+  }
+
+  private captureAdoptedStyleSheets(shadowRoot: ShadowRoot) {
+    if (
+      !shadowRoot.adoptedStyleSheets ||
+      shadowRoot.adoptedStyleSheets.length === 0
+    )
+      return;
+    const hostId = this.mirror.getId(dom.host(shadowRoot));
+    if (hostId === -1) return;
+    this.bypassOptions.stylesheetManager.adoptStyleSheets(
+      shadowRoot.adoptedStyleSheets,
+      hostId,
+    );
   }
 
   /**
