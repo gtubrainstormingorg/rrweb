@@ -919,6 +919,32 @@ describe('record', function (this: ISuite) {
       (a) => a.id === subtreeAdd!.node.id,
     );
     expect(rootAttrMutation?.attributes.class).toEqual('dataTable');
+
+    // The moved subtree's descendants must stay live in the recorder's mirror
+    // after the move. Because the move only re-adds the root (skipChild), a
+    // naive mirror cleanup can evict the descendants from the id map — then a
+    // LATER mutation on them is silently dropped (isSerialized === false) and
+    // they duplicate on replay. Capture the row ids, then in a third tick
+    // remove every row and assert each removal is recorded.
+    const rowIds = creation.data.adds
+      .filter((a) => a.node.tagName === 'tr')
+      .map((a) => a.node.id);
+    expect(rowIds.length).toEqual(5);
+
+    await ctx.page.evaluate(() => {
+      const tbody = document.querySelector('#subtree tbody');
+      if (tbody) tbody.querySelectorAll('tr').forEach((tr) => tr.remove());
+    });
+    await waitForRAF(ctx.page);
+
+    const afterRedraw = ctx.events.filter(
+      (e) =>
+        e.type === EventType.IncrementalSnapshot &&
+        e.data.source === IncrementalSource.Mutation,
+    ) as typeof mutationEvents;
+    expect(afterRedraw.length).toEqual(3);
+    const removedIds = afterRedraw[2].data.removes.map((r) => r.id).sort();
+    expect(removedIds).toEqual([...rowIds].sort());
   });
 
   describe('loading stylesheets', () => {

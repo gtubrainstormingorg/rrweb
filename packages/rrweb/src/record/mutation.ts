@@ -792,7 +792,18 @@ export default class MutationBuffer {
                   : undefined,
             });
           }
-          this.mapRemoves.push(n);
+          // `mapRemoves` evicts a node AND its whole subtree from the mirror's
+          // id map at emit time. That is correct for genuinely removed nodes,
+          // but a node still in `movedSet` is being reparented: it is re-added
+          // by the moved-set pass, and its already-mirrored descendants travel
+          // with it WITHOUT being re-serialized. Evicting them here (only the
+          // moved root is re-registered via skipChild serialization) would
+          // desync the mirror — later removes of those descendants get dropped
+          // (isSerialized === false) and the nodes duplicate on replay. So keep
+          // a moved node's subtree in the map.
+          if (!this.movedSet.has(n)) {
+            this.mapRemoves.push(n);
+          }
         });
         break;
       }
