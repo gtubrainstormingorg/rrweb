@@ -11,6 +11,7 @@ import {
   getInputType,
   toLowerCase,
   inlineBlobUrls,
+  NodeType,
 } from '@howdygo/rrweb-snapshot';
 import type { observerParam, MutationBufferParam } from '../types';
 import type {
@@ -272,6 +273,11 @@ export default class MutationBuffer {
 
     const adds: addedNodeMutation[] = [];
     const addedIds = new Set<number>();
+    // ids of moved (already-mirrored) nodes that are re-emitted as adds; their
+    // attribute/text drift must still be reported as separate mutations (see
+    // the payload filters below) because we preserve their original serialized
+    // meta so the replayer reuses the existing node.
+    const movedAddedIds = new Set<number>();
 
     /**
      * Sometimes child node may be pushed before its newly added
@@ -313,6 +319,18 @@ export default class MutationBuffer {
       if (parentId === -1 || nextId === -1) {
         return addList.addNode(n);
       }
+      // For a moved (already-mirrored) node, remember the element attributes the
+      // mirror already holds. Re-serializing reads the live DOM, which a
+      // framework may have mutated in the same tick (e.g. DataTables adding a
+      // `dataTable` class to the reparented table). If we emitted the drifted
+      // meta, the replayer's reuse-guard would consider it a different node,
+      // rebuild it empty and orphan its live subtree. Preserving the original
+      // meta lets the add replay as a move; the drift is reported separately.
+      const priorMeta = this.movedSet.has(n) ? this.mirror.getMeta(n) : null;
+      const priorAttributes =
+        priorMeta && priorMeta.type === NodeType.Element
+          ? { ...priorMeta.attributes }
+          : null;
       const sn = serializeNodeWithId(n, {
         doc: this.doc,
         mirror: this.mirror,
@@ -357,6 +375,10 @@ export default class MutationBuffer {
         cssCaptured,
       });
       if (sn) {
+        if (priorAttributes && sn.type === NodeType.Element) {
+          sn.attributes = priorAttributes;
+          movedAddedIds.add(sn.id);
+        }
         adds.push({
           parentId,
           nextId,
@@ -494,11 +516,25 @@ export default class MutationBuffer {
             attributes: attributes,
           };
         })
-        // no need to include them on added elements, as they have just been serialized with up to date attribubtes
-        .filter((attribute) => !addedIds.has(attribute.id))
+        // no need to include them on newly added elements, as they have just
+        // been serialized with up to date attributes. Moved nodes are the
+        // exception: their add preserves the mirror's original meta (so the
+        // replayer reuses the existing node), so any same-tick attribute drift
+        // must still be reported here.
+        .filter(
+          (attribute) =>
+            !addedIds.has(attribute.id) || movedAddedIds.has(attribute.id),
+        )
         // attribute mutation's id was not in the mirror map means the target node has been removed
         .filter((attribute) => this.mirror.has(attribute.id)),
-      removes: this.removes,
+      // When a node is reparented in one tick the observer reports it removed
+      // from its old parent and added to its new parent. If we keep the remove,
+      // the replayer applies it first — purging the node and its (already
+      // mirrored) subtree from the mirror — and then rebuilds the root empty,
+      // dropping the moved content. Dropping the remove for any id that is also
+      // being added lets the single add replay as a move that reuses the
+      // existing node and carries its live subtree with it.
+      removes: this.removes.filter((removal) => !addedIds.has(removal.id)),
       adds,
     };
     // payload may be empty if the mutations happened in some blocked elements
@@ -775,10 +811,14 @@ export default class MutationBuffer {
     // if n is added to set, there is no need to travel it and its' children again
     if (this.addedSet.has(n) || this.movedSet.has(n)) return;
 
+    // `true` when `n` already exists in the mirror, i.e. it is being moved
+    // (reparented) rather than freshly added.
+    let isMove = false;
     if (this.mirror.hasNode(n)) {
       if (isIgnored(n, this.mirror, this.slimDOMOptions)) {
         return;
       }
+      isMove = true;
       this.movedSet.add(n);
       let targetId: number | null = null;
       if (target && this.mirror.hasNode(target)) {
@@ -795,10 +835,27 @@ export default class MutationBuffer {
     // if this node is blocked `serializeNode` will turn it into a placeholder element
     // but we have to remove it's children otherwise they will be added as placeholders too
     if (!isBlocked(n, this.blockClass, this.blockSelector, false)) {
-      dom.childNodes(n).forEach((childN) => this.genAdds(childN));
+      dom.childNodes(n).forEach((childN) => {
+        // When `n` is being moved, its already-mirrored descendants travel
+        // with it in the DOM: on replay the existing node (and its live
+        // subtree) is reused at the new parent. Re-serializing those
+        // descendants here would emit fresh adds for ids that are still live
+        // in the mirror, which is invalid rrweb and corrupts playback
+        // (orphaned nodes, "Node not found" errors) when a framework
+        // detaches and reattaches a whole subtree in one tick. Only descend
+        // into genuinely new (unmirrored) children, which still need their
+        // own add mutations. Any attribute/text changes on the moved
+        // descendants are captured independently by the attribute/character
+        // observers.
+        if (isMove && this.mirror.hasNode(childN)) return;
+        this.genAdds(childN);
+      });
       if (hasShadowRoot(n)) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         dom.childNodes(dom.shadowRoot(n)!).forEach((childN) => {
+          // As above: a moved node's already-mirrored shadow children travel
+          // with it, so don't re-serialize them.
+          if (isMove && this.mirror.hasNode(childN)) return;
           this.processedNodeManager.add(childN, this);
           this.genAdds(childN, n);
         });

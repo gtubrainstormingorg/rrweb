@@ -807,6 +807,120 @@ describe('record', function (this: ISuite) {
     await assertSnapshot(ctx.events);
   });
 
+  it('replays a reparented subtree without dropping its live descendants', async () => {
+    // Regression test for framework-driven detach/reattach (e.g. Vue /
+    // virtual-DOM re-renders) that move a whole subtree in one tick. The
+    // recorder must not re-serialize already-mirrored descendants with fresh
+    // adds (which corrupts the mirror on playback and drops the moved content),
+    // and must emit the move so the replayer reuses the existing node and its
+    // live subtree — even when the moved root's own attributes drift.
+    // 1) Build a subtree with several children. This is captured as its own
+    //    mutation event, so every descendant becomes live in the mirror.
+    await ctx.page.evaluate(() => {
+      const { record } = (window as unknown as IWindow).rrweb;
+      record({
+        emit: (window as unknown as IWindow).emit,
+      });
+      const oldParent = document.createElement('div');
+      oldParent.setAttribute('id', 'old-parent');
+      const table = document.createElement('table');
+      table.setAttribute('id', 'subtree');
+      const tbody = document.createElement('tbody');
+      for (let i = 0; i < 5; i++) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.textContent = `row ${i}`;
+        row.appendChild(cell);
+        tbody.appendChild(row);
+      }
+      table.appendChild(tbody);
+      oldParent.appendChild(table);
+      document.body.appendChild(oldParent);
+    });
+    await waitForRAF(ctx.page); // flush the first mutation into the mirror
+
+    // 2) In a separate tick, reparent the whole (already-mirrored) subtree into
+    //    a freshly created parent, drifting a descendant attribute as a
+    //    framework (e.g. DataTables) would during the reattach.
+    await ctx.page.evaluate(() => {
+      const table = document.getElementById('subtree');
+      const newParent = document.createElement('div');
+      newParent.setAttribute('id', 'new-parent');
+      document.body.appendChild(newParent);
+      const firstRow = table?.querySelector('tr');
+      firstRow?.setAttribute('class', 'active');
+      // Drift the moved root's own attributes in the same tick, as DataTables
+      // does on init. This must not defeat the move on replay.
+      table?.setAttribute('class', 'dataTable');
+      if (table) newParent.appendChild(table);
+    });
+    await waitForRAF(ctx.page); // wait till events get sent
+
+    const mutationEvents = ctx.events.filter(
+      (e) =>
+        e.type === EventType.IncrementalSnapshot &&
+        e.data.source === IncrementalSource.Mutation,
+    ) as Array<{
+      data: {
+        adds: {
+          parentId: number;
+          node: { id: number; attributes?: Record<string, string> };
+        }[];
+        removes: { id: number }[];
+        attributes: { id: number; attributes: Record<string, unknown> }[];
+      };
+    }>;
+
+    // Two events: the subtree creation, then its reparent.
+    expect(mutationEvents.length).toEqual(2);
+    const [creation, reparent] = mutationEvents;
+
+    // A clean move re-adds only the moved subtree ROOT (that single add is the
+    // move itself; the replayer reuses the existing node and its live subtree).
+    // The bug re-serialized already-live DESCENDANTS too. Flag a re-added live
+    // id only when its parent is also re-added live — i.e. a duplicated
+    // descendant, not the move root.
+    const live = new Set<number>();
+    const duplicateDescendantAdds: number[] = [];
+    for (const e of mutationEvents) {
+      const reAddedLive = new Set(
+        e.data.adds.filter((a) => live.has(a.node.id)).map((a) => a.node.id),
+      );
+      for (const a of e.data.adds) {
+        if (reAddedLive.has(a.node.id) && reAddedLive.has(a.parentId)) {
+          duplicateDescendantAdds.push(a.node.id);
+        }
+      }
+      for (const r of e.data.removes) live.delete(r.id);
+      for (const a of e.data.adds) live.add(a.node.id);
+    }
+    expect(duplicateDescendantAdds).toEqual([]);
+
+    // The reparent is captured as a pure move: a single add re-attaching the
+    // existing subtree root at its new parent, with no remove (a remove would
+    // purge the subtree from the mirror on replay) and no descendant re-adds.
+    const subtreeAdd = reparent.data.adds.find(
+      (a) => a.node.attributes?.id === 'subtree',
+    );
+    expect(subtreeAdd).toBeTruthy();
+    expect(reparent.data.removes).toEqual([]);
+    const creationIds = new Set(creation.data.adds.map((a) => a.node.id));
+    const reAddedDescendants = reparent.data.adds
+      .map((a) => a.node.id)
+      .filter((id) => id !== subtreeAdd!.node.id && creationIds.has(id));
+    expect(reAddedDescendants).toEqual([]);
+
+    // The moved root's own attribute drift is preserved for reuse: its add
+    // carries the ORIGINAL class ('subtree' had none) and the drift is reported
+    // as a separate attribute mutation so the replayer applies it after the
+    // move.
+    expect(subtreeAdd!.node.attributes?.class).toBeUndefined();
+    const rootAttrMutation = reparent.data.attributes.find(
+      (a) => a.id === subtreeAdd!.node.id,
+    );
+    expect(rootAttrMutation?.attributes.class).toEqual('dataTable');
+  });
+
   describe('loading stylesheets', () => {
     let server: Server;
     let serverURL: string;

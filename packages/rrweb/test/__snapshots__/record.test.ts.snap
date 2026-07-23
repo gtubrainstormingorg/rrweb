@@ -2791,12 +2791,7 @@ exports[`record > is safe to checkout during async callbacks 1`] = `
       \\"source\\": 0,
       \\"texts\\": [],
       \\"attributes\\": [],
-      \\"removes\\": [
-        {
-          \\"parentId\\": 9,
-          \\"id\\": 10
-        }
-      ],
+      \\"removes\\": [],
       \\"adds\\": [
         {
           \\"parentId\\": 5,
@@ -2807,15 +2802,6 @@ exports[`record > is safe to checkout during async callbacks 1`] = `
             \\"attributes\\": {},
             \\"childNodes\\": [],
             \\"id\\": 10
-          }
-        },
-        {
-          \\"parentId\\": 10,
-          \\"nextId\\": null,
-          \\"node\\": {
-            \\"type\\": 3,
-            \\"textContent\\": \\"test\\",
-            \\"id\\": 11
           }
         }
       ]
